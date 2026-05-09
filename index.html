@@ -1,0 +1,1951 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marcos Pereira</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cstyle%3Etext%7Bfont-family%3Asystem-ui%2C-apple-system%2C%22Segoe%20UI%22%2Csans-serif%3Bfont-weight%3A900%3Bfont-size%3A64px%3Bfill%3A%23080808%7D%40media%20%28prefers-color-scheme%3Adark%29%7Btext%7Bfill%3A%23e8e4dc%7D%7D%3C/style%3E%3Ctext%20x%3D%2250%22%20y%3D%2272%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%22-4%22%3EMP%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,600&family=Unbounded:wght@200;800;900&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+#dots{position:fixed;right:1.8rem;top:2.4rem;z-index:7500;display:flex;flex-direction:column;gap:.65rem;}
+.dot{width:3px;height:3px;border-radius:50%;background:rgba(232,228,220,.15);cursor:pointer;transition:all .4s;}
+.dot.on{height:16px;border-radius:2px;background:rgba(232,228,220,.65);}
+body.light .dot{background:rgba(0,0,0,.12);}
+body.light .dot.on{background:#000;}
+html,body{width:100%;height:100%;overflow:hidden;background:#080808;}
+body{color:#e8e4dc;font-family:'DM Mono',monospace;}
+
+#grain{position:fixed;inset:0;z-index:9000;pointer-events:none;opacity:.55;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+background-size:180px;mix-blend-mode:overlay;}
+
+
+
+.nav-logo{position:fixed;top:2rem;left:3.5rem;z-index:6000;cursor:pointer;display:flex;align-items:center;gap:1.2rem;}
+.nav-logo-text{display:flex;flex-direction:column;gap:4px;}
+.nav-name{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:1.05rem;color:rgba(232,228,220,.75);letter-spacing:.08em;line-height:1;transition:color .6s;}
+.nav-sub{font-family:'DM Mono',monospace;font-size:.4rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(232,228,220,.18);line-height:1.8;transition:color .6s;display:flex;flex-direction:column;gap:0;}
+.nav-controls{display:flex;align-items:center;gap:.3rem;}
+.lang{display:flex;border:1px solid rgba(232,228,220,.1);overflow:hidden;}
+.lang button{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.1em;padding:.22rem .5rem;border:none;background:transparent;color:rgba(232,228,220,.22);cursor:pointer;text-transform:uppercase;transition:all .3s;}
+.lang button.on{background:rgba(232,228,220,.88);color:#080808;}
+#theme-btn{font-family:'DM Mono',monospace;font-size:.52rem;padding:.22rem .5rem;border:1px solid rgba(232,228,220,.1);background:transparent;color:rgba(232,228,220,.22);cursor:pointer;transition:all .3s;}
+
+.nav-right{position:fixed;top:2.2rem;right:3.5rem;z-index:6000;display:flex;flex-direction:column;align-items:flex-end;gap:.45rem;}
+.nav-right a{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(232,228,220,.22);text-decoration:none;transition:color .3s;cursor:pointer;}
+.nav-right a:hover,.nav-right a.on{color:rgba(232,228,220,.75);}
+
+/* ── PÁGINAS ──────────────────────────────────────────────── */
+
+/* P2: fundo preto, sempre visível atrás — opacity controlada por JS */
+#p2{
+  position:fixed;inset:0;z-index:1;
+  background:#080808;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:8rem 9rem 4rem 7rem;
+  opacity:0;
+  pointer-events:none;
+  visibility:hidden;
+  transition:opacity .6s cubic-bezier(.4,0,.2,1), visibility 0s linear .6s;
+}
+#p2.visible{
+  opacity:1;
+  pointer-events:auto;
+  visibility:visible;
+  transition:opacity .6s cubic-bezier(.4,0,.2,1), visibility 0s linear 0s;
+}
+
+#p1{
+  position:fixed;inset:0;z-index:2;
+  background:#080808;
+  opacity:1;
+  transition:opacity .6s cubic-bezier(.4,0,.2,1);
+}
+
+/* SVG ocupa tela toda */
+#logo-svg{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  opacity:0;
+  transition:opacity .4s ease;
+}
+
+/* ── P2 CONTEÚDO ──────────────────────────────────────────── */
+.p2-grid{
+  width:100%;
+  max-width:1100px;
+  display:grid;
+  grid-template-columns:1fr 1.3fr;
+  gap:4rem;
+  align-items:center;
+}
+.p2-num{font-size:.55rem;letter-spacing:.24em;text-transform:uppercase;color:rgba(232,228,220,.2);margin-bottom:1.8rem;}
+.p2-title{font-family:'Unbounded',sans-serif;font-weight:200;font-size:clamp(1.6rem,3vw,2.8rem);line-height:1.08;letter-spacing:-.03em;color:#e8e4dc;}
+.p2-title em{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;color:rgba(232,228,220,.38);font-size:1.1em;}
+.p2-text p{font-size:.82rem;line-height:2;color:rgba(232,228,220,.45);margin-bottom:1.2rem;letter-spacing:.02em;}
+.p2-text p strong{color:rgba(232,228,220,.8);font-weight:400;}
+.p2-skills{margin-top:2.2rem;display:flex;flex-direction:column;gap:.75rem;}
+.p2-skill-row{display:flex;align-items:center;gap:.8rem;}
+.p2-skill-name{font-size:.58rem;letter-spacing:.08em;color:rgba(232,228,220,.38);width:110px;flex-shrink:0;}
+.p2-skill-track{flex:1;height:2px;background:rgba(232,228,220,.08);border-radius:2px;overflow:hidden;}
+.p2-skill-fill{height:100%;background:rgba(232,228,220,.5);border-radius:2px;width:0%;transition:width 1.4s cubic-bezier(.16,1,.3,1);}
+.p2-skill-pct{font-size:.52rem;color:rgba(232,228,220,.22);width:28px;text-align:right;}
+
+/* ── LIGHT MODE ───────────────────────────────────────────── */
+body.light{background:#fff;color:#000;}
+body.light #p2{background:#fff;}
+body.light svg#logo-svg rect{fill:#fff;}
+body.light .mp-top text{fill:#000;}
+body.light .mp-bot text{fill:rgba(0,0,0,.25);}
+body.light .diag-line{stroke:rgba(0,0,0,.4);}
+body.light .sp-tag{fill:rgba(0,0,0,.22);}
+body.light .nav-name{color:rgba(0,0,0,.82)!important;}
+body.light .nav-sub{color:rgba(0,0,0,.4)!important;}
+body.light .nav-right a{color:rgba(0,0,0,.3);}
+body.light .nav-right a.on{color:#000;}
+body.light .lang button{color:rgba(0,0,0,.3);}
+body.light .lang button.on{background:#000;color:#fff;}
+body.light .lang{border-color:rgba(0,0,0,.15);}
+body.light #theme-btn{border-color:rgba(0,0,0,.15);color:rgba(0,0,0,.3);}
+body.light .dot{background:rgba(0,0,0,.12);}
+body.light .dot.on{background:#000;}
+body.light #grain{mix-blend-mode:multiply;opacity:.12;}
+body.light .p2-title{color:#000;}
+body.light .p2-num{color:rgba(0,0,0,.25);}
+body.light .p2-text p{color:rgba(0,0,0,.55);}
+body.light .p2-text p strong{color:#000;}
+body.light .p2-title em{color:rgba(0,0,0,.3);}
+body.light .p2-skill-name{color:rgba(0,0,0,.45);}
+body.light .p2-skill-track{background:rgba(0,0,0,.08);}
+body.light .p2-skill-fill{background:#000;}
+body.light .p2-skill-pct{color:rgba(0,0,0,.3);}
+
+/* ── P3 CARREIRA ──────────────────────────────────────────── */
+#p3{
+  position:fixed;inset:0;z-index:1;
+  background:#080808;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:7rem 9rem 4rem 7rem;
+  opacity:0;
+  pointer-events:none;
+  visibility:hidden;
+  transition:opacity .6s cubic-bezier(.4,0,.2,1), visibility 0s linear .6s;
+}
+#p3.visible{
+  opacity:1; pointer-events:auto;
+  visibility:visible;
+  transition:opacity .6s cubic-bezier(.4,0,.2,1), visibility 0s linear 0s;
+}
+
+.p3-wrap{
+  width:100%;
+  padding-bottom:4rem;
+}
+.p3-num{
+  font-size:.55rem;letter-spacing:.24em;text-transform:uppercase;
+  color:rgba(232,228,220,.2);margin-bottom:3rem;
+}
+/* Linha horizontal que conecta os itens */
+.p3-track{
+  position:relative;
+  display:flex;
+  flex-direction:row;
+  gap:0;
+  overflow-x:auto;
+  overflow-y:visible;
+  scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+  padding-bottom:1rem;
+  padding-right:6rem;
+}
+.p3-track::-webkit-scrollbar{ display:none; }
+.p3-item{
+  padding:1.8rem 3rem 1.8rem 0;
+  flex:0 0 36%;
+  min-width:300px;
+  position:relative;
+}
+.p3-item + .p3-item{
+  padding-left:3rem;
+  border-left:1px solid rgba(232,228,220,.07);
+}
+
+
+
+
+
+/* Logo empresa */
+.p3-logo{
+  height:22px;
+  margin-bottom:1.6rem;
+  display:flex;
+  align-items:center;
+}
+.p3-logo{ color:rgba(232,228,220,.75); }
+.p3-logo svg{ height:22px; width:auto; fill:currentColor; }
+
+.p3-period{
+  font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(232,228,220,.22);margin-bottom:.6rem;
+}
+.p3-role{
+  font-family:'Unbounded',sans-serif;font-weight:200;
+  font-size:clamp(.8rem,1.2vw,1rem);
+  line-height:1.2;letter-spacing:-.02em;
+  color:rgba(232,228,220,.9);
+  margin-bottom:1.2rem;
+}
+.p3-desc{
+  font-size:.75rem;line-height:1.9;
+  color:rgba(232,228,220,.38);
+  letter-spacing:.02em;
+}
+.p3-desc strong{ color:rgba(232,228,220,.65);font-weight:400; }
+.p3-tags{
+  display:flex;flex-wrap:wrap;gap:.4rem;
+  margin-top:1.4rem;
+}
+.p3-tag{
+  font-size:.45rem;letter-spacing:.14em;text-transform:uppercase;
+  padding:.28rem .7rem;
+  border:1px solid rgba(232,228,220,.1);
+  color:rgba(232,228,220,.3);
+}
+
+/* light mode */
+body.light #p3{ background:#fff; }
+body.light .p3-num{ color:rgba(0,0,0,.25); }
+body.light .p3-track::before{ background:linear-gradient(90deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.15) 15%,rgba(0,0,0,.15) 85%,rgba(0,0,0,0) 100%); }
+body.light .p3-item:last-child{ border-left-color:rgba(0,0,0,.08); }
+body.light .p3-dot{ border-color:rgba(0,0,0,.35);background:#fff; }
+body.light .p3-logo{ opacity:.7; color:#000; }
+body.light .p3-logo svg { --gap-text: #ffffff; }
+body.light .p3-period{ color:rgba(0,0,0,.3); }
+body.light .p3-role{ color:rgba(0,0,0,.85); }
+body.light .p3-desc{ color:rgba(0,0,0,.5); }
+body.light .p3-desc strong{ color:rgba(0,0,0,.75); }
+body.light .p3-tag{ border-color:rgba(0,0,0,.12);color:rgba(0,0,0,.35); }
+
+/* ── TIMELINE BAR — fora do overflow, nunca cortada ── */
+.p3-timeline-bar{
+  position:relative;
+  height:20px;
+  margin-bottom:0;
+  flex-shrink:0;
+}
+/* Linha horizontal contínua */
+.p3-timeline-bar::before{
+  content:'';
+  position:absolute;
+  top:50%; left:0; right:0;
+  height:1px;
+  transform:translateY(-50%);
+  background:linear-gradient(90deg,
+    rgba(232,228,220,.15) 0%,
+    rgba(232,228,220,.15) 95%,
+    rgba(232,228,220,0) 100%);
+}
+/* Dots posicionados por JS via left% */
+.p3-tldot{
+  position:absolute;
+  top:50%;
+  width:7px; height:7px;
+  border-radius:50%;
+  border:1px solid rgba(232,228,220,.45);
+  background:#080808;
+  transform:translate(-50%,-50%);
+  transition:border-color .3s, width .3s, height .3s;
+}
+.p3-tldot:first-of-type{ transform:translate(0,-50%); }
+body.light .p3-timeline-bar::before{ background:linear-gradient(90deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.15) 95%,rgba(0,0,0,0) 100%); }
+body.light .p3-tldot{ border-color:rgba(0,0,0,.3); background:#fff; }
+
+/* ════════════════════════════════════════════════════════════
+   SETAS DA P3 (Carreira)
+   ════════════════════════════════════════════════════════════ */
+.p3-nav-arrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:50;
+  width:40px;height:40px;
+  background:transparent;
+  border:1px solid rgba(232,228,220,.12);
+  border-radius:50%;
+  color:rgba(232,228,220,.45);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:color .3s, border-color .3s, background .3s, opacity .3s;
+}
+.p3-nav-arrow svg{ width:14px;height:14px; }
+.p3-nav-arrow:hover:not(:disabled){
+  color:rgba(232,228,220,.95);
+  border-color:rgba(232,228,220,.4);
+  background:rgba(232,228,220,.04);
+}
+.p3-nav-arrow:disabled{ opacity:.15; cursor:not-allowed; }
+.p3-nav-prev{ left:2rem; }
+.p3-nav-next{ right:2rem; }
+body.light .p3-nav-arrow{
+  border-color:rgba(0,0,0,.12);color:rgba(0,0,0,.4);
+}
+body.light .p3-nav-arrow:hover:not(:disabled){
+  color:#000;border-color:rgba(0,0,0,.4);background:rgba(0,0,0,.04);
+}
+
+/* ════════════════════════════════════════════════════════════
+   P4 — Carrossel de Projetos
+   ════════════════════════════════════════════════════════════ */
+#p4{
+  position:fixed;inset:0;z-index:1;
+  background:#080808;
+  opacity:0;
+  pointer-events:none;
+  visibility:hidden;
+  transition:opacity .6s cubic-bezier(.4,0,.2,1), visibility 0s linear .6s;
+  overflow:hidden;
+}
+#p4.visible{
+  opacity:1;
+  pointer-events:auto;
+  visibility:visible;
+  transition:opacity .6s cubic-bezier(.4,0,.2,1), visibility 0s linear 0s;
+}
+
+.p4-carousel{
+  position:absolute;
+  inset:0;
+}
+
+.p4-slide{
+  position:absolute;
+  top:9rem; bottom:5.5rem; left:7rem; right:9rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transform:translateX(40px);
+  transition:opacity .55s cubic-bezier(.4,0,.2,1), transform .55s cubic-bezier(.4,0,.2,1);
+}
+.p4-slide.active{
+  opacity:1;
+  pointer-events:auto;
+  transform:translateX(0);
+}
+.p4-slide.exiting-left{
+  transform:translateX(-40px);
+}
+
+.p4-wrap{
+  width:100%;
+  max-width:1140px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:.85fr 1.6fr;
+  gap:3rem;
+  align-items:center;
+}
+
+.p4-num{ font-size:.55rem;letter-spacing:.24em;text-transform:uppercase;color:rgba(232,228,220,.2);margin-bottom:1.8rem; }
+.p4-title{
+  font-family:'Unbounded',sans-serif;font-weight:200;
+  font-size:clamp(1.4rem,2.8vw,2.4rem);
+  line-height:1.08;letter-spacing:-.03em;
+  margin-bottom:1.4rem;
+}
+.p4-title em{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-weight:300;color:rgba(232,228,220,.35);font-size:1.1em;
+}
+.p4-desc{
+  font-size:.78rem;line-height:2;
+  color:rgba(232,228,220,.4);margin-bottom:2rem;
+}
+.p4-desc strong{ color:rgba(232,228,220,.75);font-weight:400; }
+.p4-tags{ display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:2rem; }
+.p4-tag{
+  font-size:.42rem;letter-spacing:.14em;text-transform:uppercase;
+  padding:.25rem .6rem;
+  border:1px solid rgba(232,228,220,.1);
+  color:rgba(232,228,220,.28);
+}
+.p4-btn{
+  display:inline-flex;align-items:center;gap:.5rem;
+  font-family:'DM Mono',monospace;font-size:.55rem;
+  letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(232,228,220,.45);
+  border:1px solid rgba(232,228,220,.15);
+  padding:.55rem 1.1rem;
+  text-decoration:none;
+  transition:color .3s,border-color .3s;
+  cursor:default;
+}
+.p4-btn.ready{ cursor:pointer; }
+.p4-btn.ready:hover{ color:rgba(232,228,220,.9);border-color:rgba(232,228,220,.5); }
+
+/* Setas P4 */
+.p4-nav-arrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:55;
+  width:40px;height:40px;
+  background:transparent;
+  border:1px solid rgba(232,228,220,.12);
+  border-radius:50%;
+  color:rgba(232,228,220,.45);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:color .3s, border-color .3s, background .3s, opacity .3s;
+}
+.p4-nav-arrow svg{ width:14px;height:14px; }
+.p4-nav-arrow:hover:not(:disabled){
+  color:rgba(232,228,220,.95);
+  border-color:rgba(232,228,220,.4);
+  background:rgba(232,228,220,.04);
+}
+.p4-nav-arrow:disabled{ opacity:.2;cursor:not-allowed; }
+.p4-nav-prev{ left:2rem; }
+.p4-nav-next{ right:2rem; }
+
+/* Indicadores */
+.p4-indicators{
+  position:absolute;
+  bottom:.6rem;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:.55rem;
+  z-index:50;
+}
+.p4-ind{
+  width:6px;height:6px;
+  border-radius:50%;
+  background:rgba(232,228,220,.18);
+  cursor:pointer;
+  transition:all .35s;
+}
+.p4-ind.on{
+  width:22px;
+  border-radius:3px;
+  background:rgba(232,228,220,.65);
+}
+.p4-ind:hover:not(.on){ background:rgba(232,228,220,.35); }
+
+/* Card "Em breve" */
+.p4-soon-wrap{ grid-template-columns:1fr; }
+.p4-soon-card{
+  text-align:center;
+  max-width:520px;
+  margin:0 auto;
+  padding:3rem;
+  border:1px dashed rgba(232,228,220,.12);
+  border-radius:6px;
+  background:rgba(232,228,220,.015);
+}
+
+/* Moldura iframe / editor */
+.p4-frame{
+  position:relative;
+  width:100%;
+  border-radius:6px;
+  overflow:hidden;
+  background:rgba(232,228,220,.025);
+  border:1px solid rgba(232,228,220,.1);
+  box-shadow:
+    0 0 0 1px rgba(232,228,220,.04),
+    0 20px 60px rgba(0,0,0,.45),
+    0 1px 0 rgba(232,228,220,.05) inset;
+  transition:border-color .4s, box-shadow .4s;
+}
+.p4-frame:hover{
+  border-color:rgba(232,228,220,.18);
+}
+.p4-frame-bar{
+  display:flex;align-items:center;gap:.85rem;
+  padding:.7rem 1rem;
+  background:rgba(232,228,220,.04);
+  border-bottom:1px solid rgba(232,228,220,.08);
+  font-family:'DM Mono',monospace;
+}
+.p4-frame-dots{ display:flex;gap:5px; }
+.p4-frame-dots span{
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(232,228,220,.18);
+}
+.p4-frame-title{
+  flex:1;text-align:center;
+  font-size:.5rem;letter-spacing:.22em;
+  text-transform:uppercase;color:rgba(232,228,220,.4);
+}
+.p4-frame-fullscreen{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:24px;
+  color:rgba(232,228,220,.35);
+  text-decoration:none;border-radius:3px;
+  transition:color .25s, background .25s;
+}
+.p4-frame-fullscreen:hover{
+  color:rgba(232,228,220,.85);
+  background:rgba(232,228,220,.06);
+}
+.p4-frame-body{
+  position:relative;
+  width:100%;
+  aspect-ratio:16/10;
+  background:#1a2540;
+  overflow:hidden;
+}
+.p4-iframe{
+  width:100%;height:100%;
+  border:0;display:block;
+  background:#1a2540;
+}
+.p4-frame.code-vba .p4-frame-body,
+.p4-frame.code-py  .p4-frame-body{ background:#1e1e1e; }
+
+/* Editor de código dinâmico */
+.vba-editor{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;
+  font-family:'Consolas','Courier New',monospace;
+}
+.vba-nav{
+  display:flex;align-items:stretch;
+  background:#252526;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  height:32px;
+  flex-shrink:0;
+}
+.vba-arrow{
+  flex-shrink:0;width:32px;
+  display:flex;align-items:center;justify-content:center;
+  background:#2d2d2d;
+  color:rgba(255,255,255,.5);
+  border:none;cursor:pointer;
+  transition:background .2s, color .2s;
+}
+.vba-arrow.vba-prev{ border-right:1px solid rgba(255,255,255,.06); }
+.vba-arrow.vba-next{ border-left:1px solid rgba(255,255,255,.06); }
+.vba-arrow:hover:not(:disabled){ background:#3a3a3a;color:rgba(255,255,255,.95); }
+.vba-arrow:disabled{ opacity:.25;cursor:not-allowed; }
+.vba-arrow svg{ width:12px;height:12px; }
+.vba-tabs-scroll{
+  flex:1;display:flex;
+  overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:none;scroll-behavior:smooth;
+}
+.vba-tabs-scroll::-webkit-scrollbar{ display:none; }
+.vba-tab{
+  flex-shrink:0;display:flex;align-items:center;
+  font-size:.6rem;padding:0 .9rem;
+  color:rgba(255,255,255,.5);
+  letter-spacing:.04em;cursor:pointer;
+  white-space:nowrap;
+  border-right:1px solid rgba(255,255,255,.05);
+  transition:background .2s, color .2s;
+  position:relative;
+}
+.vba-tab:hover{ color:rgba(255,255,255,.9);background:rgba(255,255,255,.03); }
+.vba-tab.active{ background:#1e1e1e;color:#e8e4dc; }
+.code-vba .vba-tab.active::before{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg, #569cd6, #4ec9b0);
+}
+.code-py .vba-tab.active::before{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg, #ffd43b, #4584b6);
+}
+.vba-tab.loading{ color:rgba(255,255,255,.3);font-style:italic; }
+.vba-code-wrap{
+  flex:1;position:relative;
+  background:#1e1e1e;overflow:hidden;
+}
+.vba-copy{
+  position:absolute;top:.5rem;right:.5rem;z-index:10;
+  display:inline-flex;align-items:center;gap:.35rem;
+  padding:.35rem .65rem;
+  background:rgba(40,40,40,.95);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:3px;
+  color:rgba(232,228,220,.7);
+  font-family:'DM Mono',monospace;
+  font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;
+  cursor:pointer;transition:all .25s;
+  backdrop-filter:blur(4px);
+}
+.vba-copy:hover{ background:rgba(60,60,60,.95);color:#fff;border-color:rgba(255,255,255,.25); }
+.vba-copy.copied{ background:rgba(86,156,214,.2);color:#7ec4ff;border-color:rgba(86,156,214,.4); }
+.code-py .vba-copy.copied{ background:rgba(255,212,59,.2);color:#ffd43b;border-color:rgba(255,212,59,.4); }
+.vba-copy svg{ width:11px;height:11px; }
+
+.vba-code{
+  position:absolute;inset:0;
+  overflow:auto;
+  display:grid;grid-template-columns:auto 1fr;
+  font-size:.62rem;line-height:1.55;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.15) transparent;
+}
+.vba-code::-webkit-scrollbar{ width:8px;height:8px; }
+.vba-code::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.15);border-radius:4px; }
+.vba-code::-webkit-scrollbar-track{ background:transparent; }
+
+.vba-gutter{
+  position:sticky;left:0;z-index:5;
+  background:#1e1e1e;
+  border-right:1px solid rgba(255,255,255,.06);
+  padding:.85rem .65rem .85rem .8rem;
+  text-align:right;
+  color:rgba(255,255,255,.25);
+  user-select:none;font-variant-numeric:tabular-nums;
+  min-width:42px;
+}
+.vba-gutter .ln{ display:block;min-height:1.55em; }
+.vba-content{
+  padding:.85rem 4rem .85rem 1rem;
+  color:rgba(232,228,220,.92);
+  white-space:pre;min-width:0;
+}
+.vba-content .ln{ display:block;min-height:1.55em; }
+
+.kw{color:#569cd6;}
+.fn{color:#dcdcaa;}
+.str{color:#ce9178;}
+.cmt{color:#6a9955;font-style:italic;}
+.var{color:#9cdcfe;}
+.num{color:#b5cea8;}
+.dec{color:#c586c0;}
+
+.vba-loading,.vba-error{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:.8rem;
+  color:rgba(232,228,220,.4);
+  font-size:.6rem;letter-spacing:.1em;
+  text-align:center;padding:2rem;
+}
+.vba-error{ color:#e07060; }
+.vba-spinner{
+  width:18px;height:18px;
+  border:2px solid rgba(232,228,220,.15);
+  border-top-color:rgba(232,228,220,.6);
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* light mode P4 */
+body.light #p4{ background:#fff; }
+body.light .p4-num{ color:rgba(0,0,0,.25); }
+body.light .p4-title{ color:#000; }
+body.light .p4-title em{ color:rgba(0,0,0,.3); }
+body.light .p4-desc{ color:rgba(0,0,0,.5); }
+body.light .p4-desc strong{ color:#000; }
+body.light .p4-tag{ border-color:rgba(0,0,0,.1);color:rgba(0,0,0,.35); }
+body.light .p4-btn{ color:rgba(0,0,0,.45);border-color:rgba(0,0,0,.2); }
+body.light .p4-btn.ready:hover{ color:#000;border-color:#000; }
+body.light .p4-soon-card{ border-color:rgba(0,0,0,.1);background:rgba(0,0,0,.015); }
+body.light .p4-nav-arrow{ border-color:rgba(0,0,0,.12);color:rgba(0,0,0,.4); }
+body.light .p4-nav-arrow:hover:not(:disabled){ color:#000;border-color:rgba(0,0,0,.4);background:rgba(0,0,0,.04); }
+body.light .p4-ind{ background:rgba(0,0,0,.18); }
+body.light .p4-ind.on{ background:#000; }
+body.light .p4-ind:hover:not(.on){ background:rgba(0,0,0,.4); }
+body.light .p4-frame{
+  background:rgba(0,0,0,.015);
+  border-color:rgba(0,0,0,.08);
+}
+body.light .p4-frame-bar{ background:rgba(0,0,0,.02);border-bottom-color:rgba(0,0,0,.06); }
+body.light .p4-frame-dots span{ background:rgba(0,0,0,.18); }
+body.light .p4-frame-title{ color:rgba(0,0,0,.4); }
+body.light .p4-frame-fullscreen{ color:rgba(0,0,0,.35); }
+body.light .p4-frame-fullscreen:hover{ color:#000;background:rgba(0,0,0,.06); }
+
+
+/* Indicadores visíveis apenas na P4 */
+.p4-indicators{ opacity:0; pointer-events:none; transition:opacity .4s; }
+body[data-page="3"] .p4-indicators{ opacity:1; pointer-events:auto; }
+body.light .p4-ind{ background:rgba(0,0,0,.18); }
+body.light .p4-ind.on{ background:#000; }
+
+/* Fundo blur na nav em todas as páginas exceto P1 (hero) */
+.nav-logo, .nav-right{ pointer-events:auto; }
+.nav-logo::before,
+.nav-right::before{
+  content:'';
+  position:absolute;
+  inset:-.6rem -1rem;
+  background:rgba(8,8,8,.72);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  border-radius:4px;
+  z-index:-1;
+  opacity:0;
+  transition:opacity .3s;
+}
+body[data-page="1"] .nav-logo::before,
+body[data-page="1"] .nav-right::before,
+body[data-page="2"] .nav-logo::before,
+body[data-page="2"] .nav-right::before,
+body[data-page="3"] .nav-logo::before,
+body[data-page="3"] .nav-right::before,
+body[data-page="4"] .nav-logo::before,
+body[data-page="4"] .nav-right::before{
+  opacity:1;
+}
+body.light .nav-logo::before,
+body.light .nav-right::before{
+  background:rgba(255,255,255,.78);
+}
+
+/* ── CV download ── */
+.p3-cv-area{
+  display:flex;align-items:center;gap:1.2rem;
+  padding:.6rem 0 .8rem;
+}
+.p3-cv-label{
+  font-size:.42rem;letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(232,228,220,.4);
+}
+.p3-cv-btns{ display:flex;align-items:center;gap:.6rem; }
+.p3-cv-btn{
+  display:inline-flex;align-items:center;gap:.35rem;
+  font-family:'DM Mono',monospace;font-size:.44rem;
+  letter-spacing:.15em;text-transform:uppercase;
+  color:rgba(232,228,220,.55);text-decoration:none;
+  padding:.28rem .6rem;border:1px solid rgba(232,228,220,.2);
+  transition:color .3s,border-color .3s;
+}
+.p3-cv-btn:hover{ color:rgba(232,228,220,.75);border-color:rgba(232,228,220,.3); }
+.p3-cv-sep{ font-size:.4rem;color:rgba(232,228,220,.1); }
+body.light .p3-cv-label{ color:rgba(0,0,0,.2); }
+body.light .p3-cv-btn{ color:rgba(0,0,0,.3);border-color:rgba(0,0,0,.1); }
+body.light .p3-cv-btn:hover{ color:#000;border-color:rgba(0,0,0,.35); }
+
+/* ── P5 CONTATO ── */
+#p5{
+  position:fixed;inset:0;z-index:1;background:#080808;
+  display:flex;align-items:center;justify-content:center;
+  padding:8rem 9rem 4rem 7rem;opacity:0;pointer-events:none;
+  visibility:hidden;
+  transition:opacity .6s cubic-bezier(.4,0,.2,1), visibility 0s linear .6s;
+}
+#p5.visible{
+  opacity:1;pointer-events:auto;
+  visibility:visible;
+  transition:opacity .6s cubic-bezier(.4,0,.2,1), visibility 0s linear 0s;
+}
+.p5-wrap{
+  width:100%;max-width:900px;
+  display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center;
+}
+.p5-num{ font-size:.55rem;letter-spacing:.24em;text-transform:uppercase;color:rgba(232,228,220,.2);margin-bottom:1.8rem; }
+.p5-title{
+  font-family:'Unbounded',sans-serif;font-weight:200;
+  font-size:clamp(1.8rem,3.5vw,3rem);line-height:1.05;letter-spacing:-.03em;margin-bottom:.8rem;
+}
+.p5-title em{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-weight:300;color:rgba(232,228,220,.35);font-size:1.05em;
+}
+.p5-sub{ font-size:.72rem;line-height:1.9;color:rgba(232,228,220,.35);margin-bottom:2.2rem; }
+.p5-links{ display:flex;flex-direction:column;gap:.5rem; }
+.p5-link{
+  display:flex;align-items:center;gap:.9rem;
+  text-decoration:none;padding:.65rem .7rem;
+  border:1px solid rgba(232,228,220,.07);
+  transition:border-color .35s,background .35s;
+}
+.p5-link-icon{
+  width:32px;height:32px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .35s;
+}
+.p5-link-icon svg{ width:15px;height:15px;fill:rgba(232,228,220,.3);transition:fill .35s; }
+.p5-link-text{ display:flex;flex-direction:column;gap:1px; }
+.p5-link-label{ font-size:.38rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(232,228,220,.18); }
+.p5-link-value{
+  font-family:'Cormorant Garamond',serif;font-weight:300;
+  font-size:.88rem;color:rgba(232,228,220,.55);transition:color .35s;
+}
+/* cores por rede ao hover */
+.p5-link--li:hover{ background:rgba(10,102,194,.1);border-color:rgba(10,102,194,.4); }
+.p5-link--li:hover .p5-link-icon svg{ fill:#0a66c2; }
+.p5-link--li:hover .p5-link-value{ color:#5ba4cf; }
+.p5-link--wa:hover{ background:rgba(37,211,102,.08);border-color:rgba(37,211,102,.4); }
+.p5-link--wa:hover .p5-link-icon svg{ fill:#25d366; }
+.p5-link--wa:hover .p5-link-value{ color:#25d366; }
+.p5-link--gm:hover{ background:rgba(234,67,53,.08);border-color:rgba(234,67,53,.4); }
+.p5-link--gm:hover .p5-link-icon svg{ fill:#ea4335; }
+.p5-link--gm:hover .p5-link-value{ color:#ea4335; }
+.p5-link--gh:hover{ background:rgba(232,228,220,.05);border-color:rgba(232,228,220,.25); }
+.p5-link--gh:hover .p5-link-icon svg{ fill:rgba(232,228,220,.9); }
+.p5-link--gh:hover .p5-link-value{ color:rgba(232,228,220,.9); }
+/* direita */
+.p5-right{ display:flex;flex-direction:column;gap:2.5rem; }
+.p5-location{ font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(232,228,220,.18);line-height:2.3; }
+.p5-location strong{ color:rgba(232,228,220,.45);font-weight:400; }
+.p5-sig{
+  font-family:'Cormorant Garamond',serif;font-weight:300;font-style:italic;
+  font-size:3.5rem;color:rgba(232,228,220,.06);line-height:1;user-select:none;
+}
+/* light */
+body.light #p5{ background:#fff; }
+body.light .p5-num{ color:rgba(0,0,0,.25); }
+body.light .p5-title{ color:#000; }
+body.light .p5-title em{ color:rgba(0,0,0,.3); }
+body.light .p5-sub{ color:rgba(0,0,0,.45); }
+body.light .p5-link{ border-color:rgba(0,0,0,.07); }
+body.light .p5-link-icon svg{ fill:rgba(0,0,0,.3); }
+body.light .p5-link-label{ color:rgba(0,0,0,.25); }
+body.light .p5-link-value{ color:rgba(0,0,0,.55); }
+body.light .p5-link--gh:hover .p5-link-icon svg{ fill:#000; }
+body.light .p5-link--gh:hover .p5-link-value{ color:#000; }
+body.light .p5-location{ color:rgba(0,0,0,.25); }
+body.light .p5-location strong{ color:rgba(0,0,0,.6); }
+body.light .p5-sig{ color:rgba(0,0,0,.05); }
+</style>
+</head>
+<body>
+<div id="grain"></div>
+
+<div id="dots">
+  <div class="dot on" onclick="goTo(0)"></div>
+  <div class="dot"    onclick="goTo(1)"></div>
+  <div class="dot"    onclick="goTo(2)"></div>
+  <div class="dot"    onclick="goTo(3)"></div>
+  <div class="dot"    onclick="goTo(4)"></div>
+</div>
+
+
+
+<div class="nav-logo" onclick="goTo(0)">
+  <div class="nav-logo-text">
+    <span class="nav-name">Marcos Pereira</span>
+    <span class="nav-sub">
+      <span data-pt="Análises" data-en="Data Analysis">Análises</span>
+      <span data-pt="Projetos" data-en="Projects">Projetos</span>
+      <span data-pt="Automações" data-en="Automations">Automações</span>
+    </span>
+  </div>
+  <div class="nav-controls">
+    <div class="lang">
+      <button class="on" onclick="setLang('pt');event.stopPropagation()">PT</button>
+      <button onclick="setLang('en');event.stopPropagation()">EN</button>
+    </div>
+    <button id="theme-btn" onclick="toggleTheme();event.stopPropagation()">◑</button>
+  </div>
+</div>
+
+<div class="nav-right">
+  <a id="nav0" onclick="goTo(0)" class="on" data-pt="Início" data-en="Home">Início</a>
+  <a id="nav1" onclick="goTo(1)" data-pt="Sobre" data-en="About">Sobre</a>
+  <a id="nav2" onclick="goTo(2)" data-pt="Carreira" data-en="Career">Carreira</a>
+  <a id="nav3" onclick="goTo(3)" data-pt="Projetos" data-en="Projects">Projetos</a>
+  <a id="nav4" onclick="goTo(4)" data-pt="Contato" data-en="Contact">Contato</a>
+</div>
+
+<!-- ── P2: SOBRE ── z-index 1, atrás de tudo -->
+<div id="p2">
+  <div class="p2-grid">
+    <div>
+      <div class="p2-num" data-pt="01 — Sobre" data-en="01 — About">01 — Sobre</div>
+      <h2 class="p2-title" data-pt="Análise que vai<br>da operação<br>à <em>diretoria</em>" data-en="Analysis that goes<br>from operations<br>to the <em>boardroom</em>">Análise que vai<br>da operação<br>à <em>diretoria</em></h2>
+      <div class="p2-skills">
+        <div class="p2-skill-row"><span class="p2-skill-name">Power BI</span><div class="p2-skill-track"><div class="p2-skill-fill" data-w="90"></div></div><span class="p2-skill-pct">90%</span></div>
+        <div class="p2-skill-row"><span class="p2-skill-name">Excel + VBA</span><div class="p2-skill-track"><div class="p2-skill-fill" data-w="95"></div></div><span class="p2-skill-pct">95%</span></div>
+        <div class="p2-skill-row"><span class="p2-skill-name">SAP ECC</span><div class="p2-skill-track"><div class="p2-skill-fill" data-w="85"></div></div><span class="p2-skill-pct">85%</span></div>
+        <div class="p2-skill-row"><span class="p2-skill-name">SQL</span><div class="p2-skill-track"><div class="p2-skill-fill" data-w="60"></div></div><span class="p2-skill-pct">60%</span></div>
+        <div class="p2-skill-row"><span class="p2-skill-name">Python</span><div class="p2-skill-track"><div class="p2-skill-fill" data-w="30"></div></div><span class="p2-skill-pct">30%</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="p2-text">
+        <p data-pt="Tenho experiência em análise de dados e automação de processos, com passagens pela <strong>McKinsey & Company</strong> e <strong>Copa Energia</strong>. Construo dashboards em Power BI a partir de relatórios SAP e desenvolvo soluções em VBA que eliminam trabalho manual." data-en="I have experience in data analysis and process automation, working at <strong>McKinsey & Company</strong> and <strong>Copa Energia</strong>. I build Power BI dashboards from SAP reports and develop VBA solutions that eliminate manual work.">Tenho experiência em análise de dados e automação de processos, com passagens pela <strong>McKinsey & Company</strong> e <strong>Copa Energia</strong>. Construo dashboards em Power BI a partir de relatórios SAP e desenvolvo soluções em VBA que eliminam trabalho manual.</p>
+        <p data-pt="Com experiência como Executive Assistant na <strong>McKinsey & Company</strong>, desenvolvi precisão operacional e capacidade de entregar em ambientes de alta pressão." data-en="As Executive Assistant at <strong>McKinsey & Company</strong>, I developed operational precision and the ability to deliver in high-pressure environments.">Com experiência como Executive Assistant na <strong>McKinsey & Company</strong>, desenvolvi precisão operacional e capacidade de entregar em ambientes de alta pressão.</p>
+        <p data-pt="Bilíngue em <strong>Português e Inglês</strong> — pós-graduação em International Business Management pelo Greystone College, Toronto." data-en="Bilingual in <strong>Portuguese and English</strong> — postgraduate in International Business Management from Greystone College, Toronto.">Bilíngue em <strong>Português e Inglês</strong> — pós-graduação em International Business Management pelo Greystone College, Toronto.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ── P3: CARREIRA ── -->
+<div id="p3">
+  <button class="p3-nav-arrow p3-nav-prev" id="p3-prev" aria-label="Empresa anterior">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="p3-nav-arrow p3-nav-next" id="p3-next" aria-label="Próxima empresa">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <div class="p3-wrap">
+    <div class="p3-num"><span data-pt="02 — Carreira" data-en="02 — Career">02 — Carreira</span></div>
+    <div class="p3-cv-area">
+      <span class="p3-cv-label" data-pt="currículo disponível para download" data-en="resume available for download">currículo disponível para download</span>
+      <div class="p3-cv-btns">
+        <a class="p3-cv-btn" href="Completo_-_PT-BR__1_.pdf" download>
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 1v7M3 5l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          PT-BR
+        </a>
+        <span class="p3-cv-sep">·</span>
+        <a class="p3-cv-btn" href="#" download>
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M6 1v7M3 5l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          EN
+        </a>
+      </div>
+    </div>
+    <div class="p3-timeline-bar" id="p3-tlbar"></div>
+    <div class="p3-track" id="p3-track">
+
+      <!-- Copa Energia -->
+      <div class="p3-item">
+        <div class="p3-logo">
+          <svg viewBox="0 0 160 28" xmlns="http://www.w3.org/2000/svg">
+            <text x="0" y="22" font-family="'Unbounded',sans-serif" font-weight="800" font-size="19" fill="currentColor" letter-spacing="-0.5">COPA</text>
+            <text x="78" y="22" font-family="'Cormorant Garamond',serif" font-weight="300" font-size="19" fill="currentColor" letter-spacing="3">energia</text>
+          </svg>
+        </div>
+        <div class="p3-period" data-pt="Out 2025 — Presente &nbsp;·&nbsp; São Paulo" data-en="Oct 2025 — Present &nbsp;·&nbsp; São Paulo">Out 2025 — Presente &nbsp;·&nbsp; São Paulo</div>
+        <div class="p3-role" data-pt="Analista de Custos Jr" data-en="Junior Cost Analyst">Analista de Custos Jr</div>
+        <div class="p3-desc">
+          <span data-pt="Análise e rateio de custos de produção, importação de produtos no <strong>SAP ECC</strong>.
+          Construção de dashboards <strong>Power BI</strong> a partir de relatórios SAP para
+          coordenação, gerência e diretoria." data-en="Cost analysis and allocation, product importation in <strong>SAP ECC</strong>.
+          Building <strong>Power BI</strong> dashboards from SAP reports for
+          coordination, management and directors.">Análise e rateio de custos de produção, importação de produtos no <strong>SAP ECC</strong>.
+          Construção de dashboards <strong>Power BI</strong> a partir de relatórios SAP para
+          coordenação, gerência e diretoria.</span>
+        </div>
+        <div class="p3-tags">
+          <span class="p3-tag">Power BI</span>
+          <span class="p3-tag">SAP ECC</span>
+          <span class="p3-tag">Excel</span>
+          <span class="p3-tag">VBA</span>
+        </div>
+      </div>
+
+      <!-- McKinsey -->
+      <div class="p3-item">
+        <div class="p3-logo">
+          <svg viewBox="0 0 220 28" xmlns="http://www.w3.org/2000/svg">
+            <text x="0" y="22" font-family="'Cormorant Garamond',serif" font-weight="600" font-size="21" fill="currentColor" letter-spacing="0.5">McKinsey &amp; Company</text>
+          </svg>
+        </div>
+        <div class="p3-period" data-pt="Ago 2021 — Out 2025 &nbsp;·&nbsp; São Paulo" data-en="Aug 2021 — Oct 2025 &nbsp;·&nbsp; São Paulo">Ago 2021 — Out 2025 &nbsp;·&nbsp; São Paulo</div>
+        <div class="p3-role">Executive Assistant</div>
+        <div class="p3-desc">
+          <span data-pt="Planejamento de itinerários e viagens para consultores globais. Desenvolvimento de
+          melhorias em processos de <strong>pagamentos e reembolsos</strong> via <strong>SAP Concur</strong>.
+          Suporte executivo de alta performance em ambiente de pressão." data-en="Planning itineraries and travel for global consultants. Developing
+          improvements in <strong>payments and reimbursements</strong> processes via <strong>SAP Concur</strong>.
+          High-performance executive support in a high-pressure environment.">Planejamento de itinerários e viagens para consultores globais. Desenvolvimento de
+          melhorias em processos de <strong>pagamentos e reembolsos</strong> via <strong>SAP Concur</strong>.
+          Suporte executivo de alta performance em ambiente de pressão.</span>
+        </div>
+        <div class="p3-tags">
+          <span class="p3-tag">SAP Concur</span>
+          <span class="p3-tag">Excel</span>
+          <span class="p3-tag">VBA</span>
+          <span class="p3-tag">Power BI</span>
+          <span class="p3-tag">PowerPoint</span>
+        </div>
+      </div>
+
+      <!-- Serede -->
+      <div class="p3-item">
+        <div class="p3-logo">
+          <svg viewBox="0 0 160 28" xmlns="http://www.w3.org/2000/svg">
+            <text x="0" y="22" font-family="'Unbounded',sans-serif" font-weight="200" font-size="17" fill="currentColor" letter-spacing="2">SEREDE</text>
+            <text x="102" y="22" font-family="'DM Mono',monospace" font-weight="300" font-size="11" fill="currentColor" opacity="0.5" letter-spacing="1">rede conecta</text>
+          </svg>
+        </div>
+        <div class="p3-period" data-pt="Nov 2020 — Abr 2021 &nbsp;·&nbsp; Salvador" data-en="Nov 2020 — Apr 2021 &nbsp;·&nbsp; Salvador">Nov 2020 — Abr 2021 &nbsp;·&nbsp; Salvador</div>
+        <div class="p3-role" data-pt="Analista de Qualidade" data-en="Quality Analyst">Analista de Qualidade</div>
+        <div class="p3-desc">
+          <span data-pt="Análise crítica de processos e recursos em serviços técnicos.
+          Desenvolvimento e atualização de processos para garantir
+          <strong>continuidade e clareza</strong> das operações do departamento." data-en="Critical analysis of processes and resources in technical services.
+          Development and update of processes to ensure
+          <strong>continuity and clarity</strong> of department operations.">Análise crítica de processos e recursos em serviços técnicos.
+          Desenvolvimento e atualização de processos para garantir
+          <strong>continuidade e clareza</strong> das operações do departamento.</span>
+        </div>
+        <div class="p3-tags">
+          <span class="p3-tag">Processos</span>
+          <span class="p3-tag">Qualidade</span>
+          <span class="p3-tag">Excel</span>
+        </div>
+      </div>
+
+      <!-- Aromarketing -->
+      <div class="p3-item">
+        <div class="p3-logo">
+          <svg viewBox="0 0 180 28" xmlns="http://www.w3.org/2000/svg">
+            <text x="0" y="22" font-family="'Cormorant Garamond',serif" font-weight="600" font-size="21" fill="currentColor" letter-spacing="1">Aromarketing</text>
+          </svg>
+        </div>
+        <div class="p3-period" data-pt="Set 2019 — Nov 2020 &nbsp;·&nbsp; Salvador" data-en="Sep 2019 — Nov 2020 &nbsp;·&nbsp; Salvador">Set 2019 — Nov 2020 &nbsp;·&nbsp; Salvador</div>
+        <div class="p3-role" data-pt="Assistente Adm. Financeiro" data-en="Financial Admin. Assistant">Assistente Adm. Financeiro</div>
+        <div class="p3-desc">
+          <span data-pt="Conciliação de extratos bancários, cobranças de carteira inadimplente,
+          antecipação de recebíveis e <strong>avaliação de crédito</strong> a novos clientes." data-en="Bank statement reconciliation, collections from delinquent accounts,
+          receivables anticipation and <strong>credit evaluation</strong> for new clients.">Conciliação de extratos bancários, cobranças de carteira inadimplente,
+          antecipação de recebíveis e <strong>avaliação de crédito</strong> a novos clientes.</span>
+        </div>
+        <div class="p3-tags">
+          <span class="p3-tag">Financeiro</span>
+          <span class="p3-tag">Excel</span>
+          <span class="p3-tag">Crédito</span>
+        </div>
+      </div>
+
+      <!-- Bargains Group -->
+      <div class="p3-item">
+        <div class="p3-logo">
+          <svg viewBox="0 0 200 28" xmlns="http://www.w3.org/2000/svg">
+            <text x="0" y="22" font-family="'Unbounded',sans-serif" font-weight="200" font-size="14" fill="currentColor" letter-spacing="1">BARGAINS GROUP</text>
+          </svg>
+        </div>
+        <div class="p3-period" data-pt="Out 2018 — Abr 2019 &nbsp;·&nbsp; Toronto" data-en="Oct 2018 — Apr 2019 &nbsp;·&nbsp; Toronto">Out 2018 — Abr 2019 &nbsp;·&nbsp; Toronto</div>
+        <div class="p3-role" data-pt="Assistente de Marketing" data-en="Marketing Assistant">Assistente de Marketing</div>
+        <div class="p3-desc">
+          <span data-pt="Desenvolvimento de banners para <strong>e-mail marketing</strong>.
+          Modificação e ajuste de produtos no catálogo online da empresa." data-en="Development of banners for <strong>email marketing</strong>.
+          Modification and adjustment of products in the company's online catalog.">Desenvolvimento de banners para <strong>e-mail marketing</strong>.
+          Modificação e ajuste de produtos no catálogo online da empresa.</span>
+        </div>
+        <div class="p3-tags">
+          <span class="p3-tag">Marketing Digital</span>
+          <span class="p3-tag">E-commerce</span>
+        </div>
+      </div>
+
+      <!-- GAP Inc -->
+      <div class="p3-item">
+        <div class="p3-logo">
+          <svg viewBox="0 0 80 28" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="2" width="54" height="24" fill="currentColor" opacity="0.85" rx="1"/>
+            <text x="5" y="20" font-family="'Unbounded',sans-serif" font-weight="800" font-size="16" fill="var(--gap-text,#080808)" letter-spacing="1">GAP</text>
+          </svg>
+        </div>
+        <div class="p3-period" data-pt="Nov 2018 — Mai 2019 &nbsp;·&nbsp; Toronto" data-en="Nov 2018 — May 2019 &nbsp;·&nbsp; Toronto">Nov 2018 — Mai 2019 &nbsp;·&nbsp; Toronto</div>
+        <div class="p3-role" data-pt="Sales Associate" data-en="Sales Associate">Sales Associate</div>
+        <div class="p3-desc">
+          <span data-pt="Vendas na franquia <strong>Bay/Bloor</strong> em Toronto.
+          Suporte ao inventário e reposição de peças do setor masculino." data-en="Sales at the <strong>Bay/Bloor</strong> franchise in Toronto.
+          Inventory support and restocking of the menswear section.">Vendas na franquia <strong>Bay/Bloor</strong> em Toronto.
+          Suporte ao inventário e reposição de peças do setor masculino.</span>
+        </div>
+        <div class="p3-tags">
+          <span class="p3-tag">Varejo</span>
+          <span class="p3-tag">Vendas</span>
+          <span class="p3-tag">Toronto</span>
+        </div>
+      </div>
+
+    </div><!-- /p3-track -->
+
+  </div><!-- /p3-wrap -->
+</div>
+
+
+
+<!-- ── P4: PROJETOS (carrossel) ── -->
+<div id="p4">
+  <button class="p4-nav-arrow p4-nav-prev" id="p4-prev" aria-label="Projeto anterior">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="p4-nav-arrow p4-nav-next" id="p4-next" aria-label="Próximo projeto">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+
+  <div class="p4-carousel" id="p4-carousel">
+
+    <!-- CARD 1 — FIPEdash -->
+    <div class="p4-slide active" data-slide="0">
+      <div class="p4-wrap">
+        <div>
+          <div class="p4-num" data-pt="03 — Projeto BI" data-en="03 — BI Project">03 — Projeto BI</div>
+          <h2 class="p4-title" data-pt="Veículos<br>Roubados<br>em <em>São Paulo</em>" data-en="Stolen<br>Vehicles<br>in <em>São Paulo</em>">Veículos<br>Roubados<br>em <em>São Paulo</em></h2>
+          <div class="p4-desc">
+            <p data-pt="Dashboard interativo analisando registros oficiais da <strong>SSP-SP</strong> de veículos subtraídos no estado de São Paulo entre <strong>2017 e 2026</strong>. Identifica padrões por marca, modelo, ano de fabricação, cor, região e período — com pipeline automatizado em <strong>Python</strong> que atualiza os dados mensalmente via <strong>GitHub Actions</strong>." data-en="Interactive dashboard analyzing official <strong>SSP-SP</strong> records of stolen vehicles in São Paulo state from <strong>2017 to 2026</strong>. Identifies patterns by brand, model, manufacturing year, color, region and period — with an automated <strong>Python</strong> pipeline that refreshes data monthly through <strong>GitHub Actions</strong>.">Dashboard interativo analisando registros oficiais da <strong>SSP-SP</strong> de veículos subtraídos no estado de São Paulo entre <strong>2017 e 2026</strong>. Identifica padrões por marca, modelo, ano de fabricação, cor, região e período — com pipeline automatizado em <strong>Python</strong> que atualiza os dados mensalmente via <strong>GitHub Actions</strong>.</p>
+          </div>
+          <div class="p4-tags">
+            <span class="p4-tag">Power BI</span>
+            <span class="p4-tag">Python</span>
+            <span class="p4-tag">GitHub Actions</span>
+            <span class="p4-tag">SSP-SP</span>
+          </div>
+          <a class="p4-btn ready" href="https://github.com/mpsp2192/FIPEdash" target="_blank">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            <span data-pt="Ver no GitHub" data-en="View on GitHub">Ver no GitHub</span>
+          </a>
+        </div>
+
+        <div class="p4-frame">
+          <div class="p4-frame-bar">
+            <span class="p4-frame-dots"><span></span><span></span><span></span></span>
+            <span class="p4-frame-title">FIPEdash · Power BI</span>
+            <a class="p4-frame-fullscreen" href="https://app.powerbi.com/view?r=eyJrIjoiM2NkMmVkMmQtYmMyMS00M2UzLWIzMzUtNDNmY2E0NTFlZTQzIiwidCI6IjIzNWU2NTZlLTJhYTktNDMyNy05M2IxLWQwOTI2YTY5YjBmNyJ9" target="_blank" title="Abrir em tela cheia">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+            </a>
+          </div>
+          <div class="p4-frame-body">
+            <iframe class="p4-iframe" title="FIPEdash" data-src="https://app.powerbi.com/view?r=eyJrIjoiM2NkMmVkMmQtYmMyMS00M2UzLWIzMzUtNDNmY2E0NTFlZTQzIiwidCI6IjIzNWU2NTZlLTJhYTktNDMyNy05M2IxLWQwOTI2YTY5YjBmNyJ9" frameborder="0" allowFullScreen="true"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 2 — VBA -->
+    <div class="p4-slide" data-slide="1">
+      <div class="p4-wrap">
+        <div>
+          <div class="p4-num" data-pt="04 — Automações" data-en="04 — Automations">04 — Automações</div>
+          <h2 class="p4-title" data-pt="Macros &amp;<br>Automações<br>em <em>VBA</em>" data-en="Macros &amp;<br>Automations<br>in <em>VBA</em>">Macros &amp;<br>Automações<br>em <em>VBA</em></h2>
+          <div class="p4-desc">
+            <p data-pt="Conjunto de macros desenvolvidas em <strong>VBA/Excel</strong> para automação de processos repetitivos — eliminando trabalho manual em rotinas de conciliação, geração de relatórios e tratamento de bases de dados. Soluções construídas em ambiente corporativo de alta exigência." data-en="Collection of macros developed in <strong>VBA/Excel</strong> to automate repetitive processes — eliminating manual work in reconciliation routines, report generation and database handling. Solutions built in a high-demand corporate environment.">Conjunto de macros desenvolvidas em <strong>VBA/Excel</strong> para automação de processos repetitivos — eliminando trabalho manual em rotinas de conciliação, geração de relatórios e tratamento de bases de dados. Soluções construídas em ambiente corporativo de alta exigência.</p>
+          </div>
+          <div class="p4-tags">
+            <span class="p4-tag">Excel</span>
+            <span class="p4-tag">VBA</span>
+            <span class="p4-tag">Automação</span>
+          </div>
+          <a class="p4-btn ready" href="https://github.com/mpsp2192/VBA-Coding" target="_blank">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            <span data-pt="Ver no GitHub" data-en="View on GitHub">Ver no GitHub</span>
+          </a>
+        </div>
+
+        <div class="p4-frame code-vba">
+          <div class="p4-frame-bar">
+            <span class="p4-frame-dots"><span></span><span></span><span></span></span>
+            <span class="p4-frame-title">Macros &amp; Automações · VBA</span>
+            <a class="p4-frame-fullscreen" href="https://github.com/mpsp2192/VBA-Coding" target="_blank" title="Ver no GitHub">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+            </a>
+          </div>
+          <div class="p4-frame-body">
+            <div class="vba-editor" data-repo="mpsp2192/VBA-Coding" data-extensions=".bas,.vba,.cls,.frm,.txt" data-lang="vba">
+              <div class="vba-nav">
+                <button class="vba-arrow vba-prev" aria-label="Anterior">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <div class="vba-tabs-scroll vba-tabs"></div>
+                <button class="vba-arrow vba-next" aria-label="Próxima">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+              <div class="vba-code-wrap">
+                <button class="vba-copy" title="Copiar">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                  <span data-pt="Copiar" data-en="Copy">Copiar</span>
+                </button>
+                <div class="vba-code">
+                  <div class="vba-loading">
+                    <div class="vba-spinner"></div>
+                    <div data-pt="Buscando macros do GitHub..." data-en="Fetching macros from GitHub...">Buscando macros do GitHub...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 3 — Python -->
+    <div class="p4-slide" data-slide="2">
+      <div class="p4-wrap">
+        <div>
+          <div class="p4-num" data-pt="05 — Scripts" data-en="05 — Scripts">05 — Scripts</div>
+          <h2 class="p4-title" data-pt="Scripts<br>em <em>Python</em>" data-en="Scripts<br>in <em>Python</em>">Scripts<br>em <em>Python</em></h2>
+          <div class="p4-desc">
+            <p data-pt="Coleção de scripts em <strong>Python</strong> para coleta, tratamento e automação de dados — desde web scraping até pipelines de ETL integrados com APIs e <strong>GitHub Actions</strong>. Soluções limpas, modulares e prontas para produção." data-en="Collection of <strong>Python</strong> scripts for data collection, processing and automation — from web scraping to ETL pipelines integrated with APIs and <strong>GitHub Actions</strong>. Clean, modular and production-ready solutions.">Coleção de scripts em <strong>Python</strong> para coleta, tratamento e automação de dados — desde web scraping até pipelines de ETL integrados com APIs e <strong>GitHub Actions</strong>. Soluções limpas, modulares e prontas para produção.</p>
+          </div>
+          <div class="p4-tags">
+            <span class="p4-tag">Python</span>
+            <span class="p4-tag">Pandas</span>
+            <span class="p4-tag">Requests</span>
+            <span class="p4-tag">ETL</span>
+          </div>
+          <a class="p4-btn ready" href="https://github.com/mpsp2192/Python" target="_blank">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            <span data-pt="Ver no GitHub" data-en="View on GitHub">Ver no GitHub</span>
+          </a>
+        </div>
+
+        <div class="p4-frame code-py">
+          <div class="p4-frame-bar">
+            <span class="p4-frame-dots"><span></span><span></span><span></span></span>
+            <span class="p4-frame-title">Scripts · Python</span>
+            <a class="p4-frame-fullscreen" href="https://github.com/mpsp2192/Python" target="_blank" title="Ver no GitHub">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+            </a>
+          </div>
+          <div class="p4-frame-body">
+            <div class="vba-editor" data-repo="mpsp2192/Python" data-extensions=".py" data-lang="python">
+              <div class="vba-nav">
+                <button class="vba-arrow vba-prev" aria-label="Anterior">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <div class="vba-tabs-scroll vba-tabs"></div>
+                <button class="vba-arrow vba-next" aria-label="Próxima">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+              <div class="vba-code-wrap">
+                <button class="vba-copy" title="Copiar">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                  <span data-pt="Copiar" data-en="Copy">Copiar</span>
+                </button>
+                <div class="vba-code">
+                  <div class="vba-loading">
+                    <div class="vba-spinner"></div>
+                    <div data-pt="Buscando scripts do GitHub..." data-en="Fetching scripts from GitHub...">Buscando scripts do GitHub...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 4 — Em breve -->
+    <div class="p4-slide" data-slide="3">
+      <div class="p4-wrap p4-soon-wrap">
+        <div class="p4-soon-card">
+          <div class="p4-num" data-pt="06 — Em breve" data-en="06 — Coming soon">06 — Em breve</div>
+          <h2 class="p4-title" data-pt="Próximo<br><em>projeto</em>" data-en="Next<br><em>project</em>">Próximo<br><em>projeto</em></h2>
+          <div class="p4-desc">
+            <p data-pt="Novos projetos chegando em breve — análises, dashboards e automações em desenvolvimento." data-en="New projects coming soon — analyses, dashboards and automations in the works.">Novos projetos chegando em breve — análises, dashboards e automações em desenvolvimento.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="p4-indicators" id="p4-indicators">
+    <span class="p4-ind on" data-go="0"></span>
+    <span class="p4-ind"     data-go="1"></span>
+    <span class="p4-ind"     data-go="2"></span>
+    <span class="p4-ind"     data-go="3"></span>
+  </div>
+</div>
+
+
+<!-- ── P5: CONTATO ── -->
+<div id="p5">
+  <div class="p5-wrap">
+    <div>
+      <div class="p5-num" data-pt="04 — Contato" data-en="04 — Contact">04 — Contato</div>
+      <h2 class="p5-title" data-pt="Vamos<br><em>conversar</em>" data-en="Let's<br><em>talk</em>">Vamos<br><em>conversar</em></h2>
+      <p class="p5-sub" data-pt="Projetos, parcerias ou só uma boa conversa." data-en="Projects, partnerships or just a good conversation.">Projetos, parcerias ou só uma boa conversa.</p>
+      <div class="p5-links">
+        <a class="p5-link p5-link--li" href="https://www.linkedin.com/in/marcos-paulo-pereira-ba0800156" target="_blank">
+          <div class="p5-link-icon"><svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></div>
+          <div class="p5-link-text"><span class="p5-link-label">LinkedIn</span><span class="p5-link-value">Marcos Paulo Pereira</span></div>
+        </a>
+        <a class="p5-link p5-link--wa" href="https://wa.me/5571996289679" target="_blank">
+          <div class="p5-link-icon"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></div>
+          <div class="p5-link-text"><span class="p5-link-label">WhatsApp</span><span class="p5-link-value">+55 (71) 99628-9679</span></div>
+        </a>
+        <a class="p5-link p5-link--gm" href="mailto:marcospsp92@gmail.com">
+          <div class="p5-link-icon"><svg viewBox="0 0 24 24"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.548l8.073-6.055C21.69 2.28 24 3.434 24 5.457z"/></svg></div>
+          <div class="p5-link-text"><span class="p5-link-label">E-mail</span><span class="p5-link-value">marcospsp92@gmail.com</span></div>
+        </a>
+        <a class="p5-link p5-link--gh" href="https://github.com/mpsp2192" target="_blank">
+          <div class="p5-link-icon"><svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></div>
+          <div class="p5-link-text"><span class="p5-link-label">GitHub</span><span class="p5-link-value">github.com/mpsp2192</span></div>
+        </a>
+      </div>
+    </div>
+    <div class="p5-right">
+      <div class="p5-location">
+        <strong data-pt="São Paulo, Brasil" data-en="São Paulo, Brazil">São Paulo, Brasil</strong><br>
+      </div>
+      <div class="p5-sig">Marcos<br>Paulo</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── P1: HERO ── z-index 2, na frente -->
+<div id="p1" class="visible">
+  <svg id="logo-svg"
+    viewBox="-7 -50 700 320"
+    fill="none"
+    preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <clipPath id="clip-top"><polygon points="0,0 700,0 700,175 0,135"/></clipPath>
+      <clipPath id="clip-bot"><polygon points="0,135 700,175 700,320 0,320"/></clipPath>
+    </defs>
+    <!-- rect gigante: pinta o fundo de preto, mascara o P2 enquanto P1 está visível -->
+    <rect x="-9999" y="-9999" width="99999" height="99999" fill="#080808"/>
+    <g class="mp-top" clip-path="url(#clip-top)">
+      <text x="0" y="268" font-family="'Unbounded',sans-serif" font-weight="800" font-size="280" fill="rgba(232,228,220,.92)" letter-spacing="-12">MP</text>
+    </g>
+    <g class="mp-bot" clip-path="url(#clip-bot)">
+      <text x="0" y="268" font-family="'Unbounded',sans-serif" font-weight="800" font-size="280" fill="rgba(232,228,220,.28)" letter-spacing="-12">MP</text>
+    </g>
+    <line class="diag-line" x1="0" y1="135" x2="700" y2="175" stroke="rgba(232,228,220,.55)" stroke-width="1.5"/>
+    <text class="sp-tag" x="538" y="162" font-family="'DM Mono',monospace" font-size="13" fill="rgba(232,228,220,.22)" letter-spacing="6">SP</text>
+  </svg>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ── REFS ──────────────────────────────────────────────────────
+const p1El   = document.getElementById('p1');
+const p2El   = document.getElementById('p2');
+const p3El   = document.getElementById('p3');
+const p4El   = document.getElementById('p4');
+const p5El   = document.getElementById('p5');
+const svgEl  = document.getElementById('logo-svg');
+const dotEls = [...document.querySelectorAll('.dot')];
+let page = 0, busy = false, rafId = null;
+
+// ── SVG ZOOM ──────────────────────────────────────────────────
+const VB0 = { x:-7, y:-50, w:700, h:320 };
+const ZOOM_CX = 343, ZOOM_CY = 110;
+const ease = t => t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+
+function setVB(t) {
+  t = Math.max(0, Math.min(1, t));
+  const e = ease(t);
+  const w = VB0.w * (1 - e * 0.9999);
+  const h = VB0.h * (1 - e * 0.9999);
+  svgEl.setAttribute('viewBox', `${ZOOM_CX-w/2} ${ZOOM_CY-h/2} ${w} ${h}`);
+}
+
+function animTo(from, to, dur, cb) {
+  cancelAnimationFrame(rafId);
+  const t0 = performance.now();
+  (function tick(now) {
+    const p = Math.min((now-t0)/dur, 1);
+    setVB(from + (to-from)*ease(p));
+    if (p < 1) rafId = requestAnimationFrame(tick);
+    else { setVB(to); cb && cb(); }
+  })(performance.now());
+}
+
+// ── FADE HELPERS ──────────────────────────────────────────────
+function showPage(el) {
+  el.classList.add('visible');
+}
+function hidePage(el) {
+  el.classList.remove('visible');
+}
+
+// ── NAVEGAÇÃO ─────────────────────────────────────────────────
+
+// P1 → P2
+function enterP2() {
+  if (busy || page !== 0) return;
+  busy = true;
+  animTo(0, 1, 800, () => {
+    showPage(p2El);
+    p1El.style.opacity = '0';
+    setTimeout(() => {
+      p1El.style.display = 'none';
+      p1El.style.opacity = '';
+      page = 1; updateUI(); busy = false;
+      p2El.querySelectorAll('.p2-skill-fill').forEach((f,i) =>
+        setTimeout(() => { f.style.width = f.dataset.w+'%'; }, i*150+200));
+    }, 650);
+  });
+}
+
+// P2 → P1
+function enterP1() {
+  if (busy || page !== 1) return;
+  busy = true;
+  p2El.querySelectorAll('.p2-skill-fill').forEach(f => {
+    f.style.transition = 'none'; f.style.width = '0%';
+  });
+  setVB(1);
+  svgEl.style.transition = 'none';
+  svgEl.style.opacity    = '1';
+  p1El.style.display     = '';
+  p1El.style.opacity     = '0';
+  p1El.getBoundingClientRect();
+  p1El.style.opacity = '1';
+  hidePage(p2El);
+  setTimeout(() => {
+    svgEl.style.transition = '';
+    animTo(1, 0, 800, () => { busy = false; });
+    page = 0; updateUI();
+  }, 650);
+}
+
+// P2 → P3
+function enterP3() {
+  if (busy || page !== 1) return;
+  busy = true;
+  showPage(p3El);
+  hidePage(p2El);
+  setTimeout(() => {
+    page = 2; updateUI(); busy = false;
+    initTimelineDots();
+  }, 650);
+}
+
+// P3 → P2
+function enterP2back() {
+  if (busy || page !== 2) return;
+  busy = true;
+  showPage(p2El);
+  hidePage(p3El);
+  setTimeout(() => { page = 1; updateUI(); busy = false; }, 650);
+}
+
+// P3 → P4
+function enterP4() {
+  if (busy || page !== 2) return;
+  busy = true;
+  showPage(p4El);
+  hidePage(p3El);
+  setTimeout(() => {
+    page = 3; updateUI(); busy = false;
+    activateP4();
+  }, 650);
+}
+
+// P4 → P3
+function enterP3fromP4() {
+  if (busy || page !== 3) return;
+  busy = true;
+  showPage(p3El);
+  hidePage(p4El);
+  setTimeout(() => { page = 2; updateUI(); busy = false; initTimelineDots(); }, 650);
+}
+
+// goTo — chamado pelo nav e dots, funciona de qualquer página
+
+function enterP5() {
+  if (busy || page !== 3) return;
+  busy = true;
+  showPage(p5El); hidePage(p4El);
+  setTimeout(() => { page=4; updateUI(); busy=false; }, 650);
+}
+function enterP4fromP5() {
+  if (busy || page !== 4) return;
+  busy = true;
+  showPage(p4El); hidePage(p5El);
+  setTimeout(() => { page=3; updateUI(); busy=false; activateP4(); }, 650);
+}
+function goTo(idx) {
+  if (idx === page || busy) return;
+  busy = true;
+
+  // ── Caso especial: SAINDO de P1 (qualquer destino) → zoom-in animado ──
+  if (page === 0 && idx !== 0) {
+    // Esconde outras páginas
+    hidePage(p2El); hidePage(p3El); hidePage(p4El); hidePage(p5El);
+
+    // Mostra a página destino ATRÁS do P1 (pré-render)
+    let destEl = null;
+    if (idx === 1) destEl = p2El;
+    else if (idx === 2) destEl = p3El;
+    else if (idx === 3) destEl = p4El;
+    else if (idx === 4) destEl = p5El;
+    showPage(destEl);
+
+    // Anima zoom-in do SVG (P1 mergulha para dentro do logo)
+    animTo(0, 1, 800, () => {
+      // Após zoom completo, esconde P1
+      p1El.style.opacity = '0';
+      setTimeout(() => {
+        p1El.style.display = 'none';
+        p1El.style.opacity = '';
+        page = idx; updateUI(); busy = false;
+
+        // Animações específicas de cada página
+        if (idx === 1) {
+          p2El.querySelectorAll('.p2-skill-fill').forEach((f, i) => {
+            f.style.transition = '';
+            setTimeout(() => { f.style.width = f.dataset.w + '%'; }, i * 150 + 200);
+          });
+        } else if (idx === 2) {
+          initTimelineDots();
+        } else if (idx === 3) {
+          activateP4();
+        }
+      }, 400);
+    });
+    return;
+  }
+
+  // ── Caso especial: ENTRANDO em P1 vindo de qualquer página → zoom-out ──
+  if (idx === 0 && page !== 0) {
+    if (page === 1) { busy = false; enterP1(); return; }
+
+    // Mostra P1 com viewBox totalmente zoomado (preto)
+    setVB(1);
+    svgEl.style.transition = 'none';
+    svgEl.style.opacity    = '1';
+    p1El.style.display     = '';
+    p1El.style.opacity     = '0';
+    p1El.getBoundingClientRect();
+    p1El.style.opacity     = '1';
+
+    setTimeout(() => {
+      svgEl.style.transition = '';
+      animTo(1, 0, 1000, () => { busy = false; });
+      // Esconde a página anterior depois que P1 já está visível
+      hidePage(p2El); hidePage(p3El); hidePage(p4El); hidePage(p5El);
+    }, 650);
+
+    page = 0; updateUI();
+    return;
+  }
+
+  // ── Casos restantes: navegação entre P2/P3/P4/P5 (sem P1 envolvida) ──
+
+  // Reseta skill bars do P2 quando sai dele
+  if (page === 1 && idx !== 1) {
+    p2El.querySelectorAll('.p2-skill-fill').forEach(f => {
+      f.style.transition = 'none';
+      f.style.width = '0%';
+    });
+  }
+
+  // Esconde a página atual
+  if (page === 1) hidePage(p2El);
+  else if (page === 2) hidePage(p3El);
+  else if (page === 3) hidePage(p4El);
+  else if (page === 4) hidePage(p5El);
+
+  // Mostra a página destino
+  if (idx === 1) {
+    showPage(p2El);
+    setTimeout(() => {
+      page = 1; updateUI(); busy = false;
+      p2El.querySelectorAll('.p2-skill-fill').forEach((f, i) => {
+        f.style.transition = '';
+        setTimeout(() => { f.style.width = f.dataset.w + '%'; }, i * 150 + 200);
+      });
+    }, 650);
+  } else if (idx === 2) {
+    showPage(p3El);
+    setTimeout(() => {
+      page = 2; updateUI(); busy = false;
+      initTimelineDots();
+    }, 650);
+  } else if (idx === 3) {
+    showPage(p4El);
+    setTimeout(() => {
+      page = 3; updateUI(); busy = false;
+      activateP4();
+    }, 650);
+  } else if (idx === 4) {
+    showPage(p5El);
+    setTimeout(() => {
+      page = 4; updateUI(); busy = false;
+    }, 650);
+  }
+}
+
+
+// ── SCROLL / WHEEL ────────────────────────────────────────────
+window.addEventListener('wheel', e => {
+  e.preventDefault();
+  if (page === 2) {
+    const track = document.getElementById('p3-track');
+    if (!track) return;
+    const atStart = track.scrollLeft <= 0;
+    const atEnd   = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
+    if (e.deltaY < 0 && atStart) { enterP2back(); }
+    else if (e.deltaY > 0 && atEnd) { enterP4(); }
+    else { track.scrollBy({ left: e.deltaY * 1.2, behavior: 'smooth' }); }
+    return;
+  }
+  if (page === 3) {
+    if (busy) return;
+    if (e.deltaY > 0) {
+      if (carouselIndex < 3) carouselGo(carouselIndex + 1);
+      else enterP5();
+    } else if (e.deltaY < 0) {
+      if (carouselIndex > 0) carouselGo(carouselIndex - 1);
+      else enterP3fromP4();
+    }
+    return;
+  }
+  if (busy) return;
+  if (page === 0 && e.deltaY > 0) enterP2();
+  else if (page === 1 && e.deltaY > 0) enterP3();
+  else if (page === 1 && e.deltaY < 0) enterP1();
+  else if (page === 4 && e.deltaY < 0) enterP4fromP5();
+}, { passive: false });
+
+// ── UPDATE UI ─────────────────────────────────────────────────
+function updateUI() {
+  dotEls.forEach((d,i) => d.classList.toggle('on', i===page));
+  ['nav0','nav1','nav2','nav3','nav4'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('on', i===page);
+  });
+  document.body.dataset.page = page;
+}
+
+// ── IDIOMA ────────────────────────────────────────────────────
+let lang = 'pt';
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('.lang button').forEach(b =>
+    b.classList.toggle('on', b.textContent.toLowerCase()===l));
+  document.documentElement.lang = l==='pt' ? 'pt-BR' : 'en';
+  document.querySelectorAll('[data-'+l+']').forEach(el => {
+    const v = el.getAttribute('data-'+l);
+    if (!v) return;
+    if (v.includes('<')) el.innerHTML = v; else el.textContent = v;
+  });
+}
+
+// ── TEMA ──────────────────────────────────────────────────────
+let theme = 'dark';
+function toggleTheme() {
+  const nextLight = theme === 'dark';
+  let t0 = null;
+  const dur = 1800;
+  let overlay = document.getElementById('wave-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'wave-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:8998;pointer-events:none;';
+    overlay.innerHTML = `<svg style="position:absolute;inset:0;width:100%;height:100%">
+      <defs>
+        <filter id="wf" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+          <feTurbulence id="wt" type="turbulence" baseFrequency="0.012 0.008"
+            numOctaves="4" seed="2" stitchTiles="stitch" result="noise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise"
+            scale="0" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+      </defs>
+      <rect width="100%" height="100%" fill="none"/>
+    </svg>`;
+    document.body.appendChild(overlay);
+  }
+  const wt = overlay.querySelector('#wt');
+  document.body.style.filter = 'url(#wf)';
+  function frame(ts) {
+    if (!t0) t0 = ts;
+    const t = Math.min((ts-t0)/dur, 1);
+    let intensity;
+    if (t < 0.35)      intensity = t/0.35;
+    else if (t < 0.65) intensity = 1;
+    else               intensity = 1-((t-0.65)/0.35);
+    const scale = intensity*18;
+    const freq  = 0.003+intensity*0.005;
+    wt.setAttribute('baseFrequency', `${freq} ${freq}`);
+    const dm = overlay.querySelector('feDisplacementMap');
+    if (dm) dm.setAttribute('scale', scale);
+    if (t >= 0.5 && !overlay._switched) {
+      overlay._switched = true;
+      theme = nextLight ? 'light' : 'dark';
+      document.body.classList.toggle('light', theme==='light');
+    }
+    if (t < 1) requestAnimationFrame(frame);
+    else { document.body.style.filter=''; overlay._switched=false; }
+  }
+  requestAnimationFrame(frame);
+}
+
+// ── TIMELINE DOTS P3 ──────────────────────────────────────────
+function initTimelineDots() {
+  const bar   = document.getElementById('p3-tlbar');
+  const track = document.getElementById('p3-track');
+  if (!bar || !track) return;
+  const items = [...track.querySelectorAll('.p3-item')];
+  bar.innerHTML = '';
+  items.forEach(() => {
+    const dot = document.createElement('div');
+    dot.className = 'p3-tldot';
+    bar.appendChild(dot);
+  });
+  function updateDots() {
+    const dots  = [...bar.querySelectorAll('.p3-tldot')];
+    const barW  = bar.offsetWidth;
+    const scrollL = track.scrollLeft;
+    items.forEach((item, i) => {
+      const visibleLeft = item.offsetLeft - scrollL;
+      const pct = visibleLeft / barW * 100;
+      const dot = dots[i];
+      if (!dot) return;
+      dot.style.left    = pct + '%';
+      dot.style.opacity = (pct < -2 || pct > 102) ? '0' : '1';
+      if (i === 0) {
+        dot.style.width = dot.style.height = '9px';
+        dot.style.borderColor = 'rgba(232,228,220,.7)';
+      }
+    });
+  }
+  track.removeEventListener('scroll', track._dotHandler);
+  track._dotHandler = updateDots;
+  track.addEventListener('scroll', updateDots, { passive: true });
+  setTimeout(updateDots, 50);
+  initP3Arrows();
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+updateUI();
+
+
+// ════════════════════════════════════════════════════════════
+// CARROSSEL P4
+// ════════════════════════════════════════════════════════════
+let carouselIndex = 0;
+const TOTAL_SLIDES = 4;
+
+function carouselGo(idx) {
+  if (idx < 0 || idx >= TOTAL_SLIDES || idx === carouselIndex) return;
+
+  const slides = document.querySelectorAll('.p4-slide');
+  const goingForward = idx > carouselIndex;
+
+  slides.forEach((s, i) => {
+    s.classList.remove('active', 'exiting-left');
+    if (i === carouselIndex && goingForward) s.classList.add('exiting-left');
+    if (i === idx) s.classList.add('active');
+  });
+
+  document.querySelectorAll('.p4-ind').forEach((d, i) => {
+    d.classList.toggle('on', i === idx);
+  });
+
+  const prev = document.getElementById('p4-prev');
+  const next = document.getElementById('p4-next');
+  // Setas nunca desabilitadas — nos extremos elas levam para outras páginas
+  if (prev) prev.disabled = false;
+  if (next) next.disabled = false;
+
+  carouselIndex = idx;
+
+  const activeSlide = slides[idx];
+  if (activeSlide) {
+    const editor = activeSlide.querySelector('.vba-editor');
+    if (editor && !editor.dataset.loaded) loadCodeRepo(editor);
+  }
+}
+
+function initCarousel() {
+  const prev = document.getElementById('p4-prev');
+  const next = document.getElementById('p4-next');
+  if (prev) {
+    prev.onclick = () => {
+      if (carouselIndex === 0) {
+        // Primeiro card: seta esquerda volta para P3 (Carreira)
+        enterP3fromP4();
+      } else {
+        carouselGo(carouselIndex - 1);
+      }
+    };
+    prev.disabled = false;
+  }
+  if (next) {
+    next.onclick = () => {
+      if (carouselIndex === TOTAL_SLIDES - 1) {
+        // Último card: seta direita avança para P5 (Contato)
+        enterP5();
+      } else {
+        carouselGo(carouselIndex + 1);
+      }
+    };
+    next.disabled = false;
+  }
+  document.querySelectorAll('.p4-ind').forEach(d => {
+    d.onclick = () => carouselGo(parseInt(d.dataset.go));
+  });
+}
+
+let p4Activated = false;
+function activateP4() {
+  if (p4Activated) return;
+  p4Activated = true;
+  document.querySelectorAll('#p4 iframe[data-src]').forEach(f => {
+    f.src = f.dataset.src;
+  });
+  const activeSlide = document.querySelector('.p4-slide.active');
+  if (activeSlide) {
+    const editor = activeSlide.querySelector('.vba-editor');
+    if (editor && !editor.dataset.loaded) loadCodeRepo(editor);
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// EDITOR DE CÓDIGO DINÂMICO
+// ════════════════════════════════════════════════════════════
+const KEYWORDS_VBA = ['Sub','End','Function','Dim','As','If','Then','Else','ElseIf','For','To','Next','Do','While','Loop','With','Set','Call','Public','Private','Const','ByVal','ByRef','Optional','Return','Exit','And','Or','Not','True','False','Nothing','Long','Integer','String','Double','Boolean','Variant','Worksheet','Workbook','Range','Object','Date','Until','Each','In','Step','Select','Case','Is','New','Me','Application','ActiveWorkbook','ActiveSheet','ActiveCell','Cells','Rows','Columns','xlUp','xlDown','xlToLeft','xlToRight','xlPasteAll','xlNone','xlPasteValues','MsgBox','Sheets'];
+const KEYWORDS_PY  = ['def','class','return','if','elif','else','for','while','in','not','and','or','is','None','True','False','import','from','as','try','except','finally','raise','with','pass','break','continue','lambda','yield','global','nonlocal','async','await','print','len','range','str','int','float','list','dict','set','tuple','bool','open','self','__init__','__name__','__main__'];
+
+function highlightCode(code, lang) {
+  code = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  if (lang === 'python') {
+    code = code.replace(/(#[^\n]*)/g, '<span class="cmt">$1</span>');
+    code = code.replace(/(&quot;&quot;&quot;[\s\S]*?&quot;&quot;&quot;|&#39;&#39;&#39;[\s\S]*?&#39;&#39;&#39;)/g, '<span class="str">$1</span>');
+    code = code.replace(/(&quot;[^&\n]*?&quot;|&#39;[^&\n]*?&#39;)/g, '<span class="str">$1</span>');
+    code = code.replace(/^(\s*@\w+)/gm, '<span class="dec">$1</span>');
+    code = code.replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
+    const kw = new RegExp('\\b(' + KEYWORDS_PY.join('|') + ')\\b', 'g');
+    code = code.replace(kw, '<span class="kw">$1</span>');
+  } else {
+    code = code.replace(/('[^\n]*)/g, '<span class="cmt">$1</span>');
+    code = code.replace(/(&quot;[^&]*?&quot;)/g, '<span class="str">$1</span>');
+    code = code.replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
+    const kw = new RegExp('\\b(' + KEYWORDS_VBA.join('|') + ')\\b', 'g');
+    code = code.replace(kw, '<span class="kw">$1</span>');
+  }
+  return code;
+}
+
+function renderCode(editor, content) {
+  editor._currentText = content;
+  const codeEl = editor.querySelector('.vba-code');
+  const lang = editor.dataset.lang || 'vba';
+  const lines = content.split('\n');
+  const linesHTML  = lines.map(l => `<span class="ln">${highlightCode(l, lang) || '&nbsp;'}</span>`).join('');
+  const gutterHTML = lines.map((_, i) => `<span class="ln">${i+1}</span>`).join('');
+  codeEl.innerHTML = `<div class="vba-gutter">${gutterHTML}</div><div class="vba-content">${linesHTML}</div>`;
+}
+
+async function selectMacro(editor, index) {
+  const items = editor._macros || [];
+  if (index < 0 || index >= items.length) return;
+  editor._currentIndex = index;
+  const tabs = editor.querySelectorAll('.vba-tab');
+  tabs.forEach((t, i) => t.classList.toggle('active', i === index));
+  if (tabs[index]) tabs[index].scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+  editor.querySelector('.vba-prev').disabled = (index === 0);
+  editor.querySelector('.vba-next').disabled = (index === items.length - 1);
+  const codeEl = editor.querySelector('.vba-code');
+  codeEl.innerHTML = `<div class="vba-loading"><div class="vba-spinner"></div><div>${items[index].nome}...</div></div>`;
+  try {
+    const res = await fetch(items[index].url);
+    const text = await res.text();
+    renderCode(editor, text);
+  } catch (e) {
+    codeEl.innerHTML = `<div class="vba-error">Erro ao carregar arquivo</div>`;
+  }
+}
+
+async function loadCodeRepo(editor) {
+  if (editor.dataset.loaded === 'true') return;
+  editor.dataset.loaded = 'true';
+  const repo = editor.dataset.repo;
+  const exts = (editor.dataset.extensions || '.bas,.vba,.cls,.frm,.txt')
+    .split(',').map(e => e.trim().replace(/^\./, ''));
+  const tabsEl = editor.querySelector('.vba-tabs');
+  const codeEl = editor.querySelector('.vba-code');
+  const API = `https://api.github.com/repos/${repo}/contents`;
+  try {
+    const res = await fetch(API);
+    if (!res.ok) {
+      if (res.status === 404) {
+        tabsEl.innerHTML = '';
+        codeEl.innerHTML = `<div class="vba-error" data-pt="Repositório ainda não disponível —<br>publicação em breve" data-en="Repository not available yet —<br>publishing soon">Repositório ainda não disponível —<br>publicação em breve</div>`;
+        return;
+      }
+      throw new Error(res.status);
+    }
+    const files = await res.json();
+    const macros = files.filter(f => {
+      if (f.type !== 'file') return false;
+      const ext = f.name.split('.').pop().toLowerCase();
+      return exts.includes(ext);
+    });
+    if (!macros.length) {
+      tabsEl.innerHTML = '';
+      codeEl.innerHTML = `<div class="vba-error">Nenhum arquivo encontrado</div>`;
+      return;
+    }
+    editor._macros = macros.map(m => ({
+      nome: m.name.replace(new RegExp('\\.(' + exts.join('|') + ')$', 'i'), ''),
+      url: m.download_url
+    }));
+    tabsEl.innerHTML = '';
+    editor._macros.forEach((m, i) => {
+      const tab = document.createElement('span');
+      tab.className = 'vba-tab' + (i === 0 ? ' active' : '');
+      tab.textContent = m.nome;
+      tab.onclick = () => selectMacro(editor, i);
+      tabsEl.appendChild(tab);
+    });
+    selectMacro(editor, 0);
+  } catch (e) {
+    tabsEl.innerHTML = '';
+    codeEl.innerHTML = `<div class="vba-error">Não foi possível carregar do GitHub</div>`;
+    editor.dataset.loaded = 'false';
+  }
+}
+
+function initEditors() {
+  document.querySelectorAll('.vba-editor').forEach(editor => {
+    editor.querySelector('.vba-prev').onclick = () => selectMacro(editor, (editor._currentIndex || 0) - 1);
+    editor.querySelector('.vba-next').onclick = () => selectMacro(editor, (editor._currentIndex || 0) + 1);
+    const copyBtn = editor.querySelector('.vba-copy');
+    if (copyBtn) {
+      copyBtn.onclick = async () => {
+        if (!editor._currentText) return;
+        try {
+          await navigator.clipboard.writeText(editor._currentText);
+          const span = copyBtn.querySelector('span');
+          const original = span.textContent;
+          copyBtn.classList.add('copied');
+          span.textContent = 'Copiado!';
+          setTimeout(() => { copyBtn.classList.remove('copied'); span.textContent = original; }, 2000);
+        } catch (e) { alert('Erro ao copiar'); }
+      };
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// SETAS P3 (Carreira)
+// ════════════════════════════════════════════════════════════
+function initP3Arrows() {
+  const track = document.getElementById('p3-track');
+  const prev = document.getElementById('p3-prev');
+  const next = document.getElementById('p3-next');
+  if (!track || !prev || !next) return;
+
+  function getStep() {
+    const item = track.querySelector('.p3-item');
+    return item ? item.offsetWidth : 380;
+  }
+  function updateArrows() {
+    prev.disabled = track.scrollLeft <= 2;
+    next.disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
+  }
+  prev.onclick = () => track.scrollBy({ left: -getStep(), behavior: 'smooth' });
+  next.onclick = () => track.scrollBy({ left: getStep(), behavior: 'smooth' });
+  if (!track._p3ArrowsBound) {
+    track.addEventListener('scroll', updateArrows, { passive: true });
+    track._p3ArrowsBound = true;
+  }
+  setTimeout(updateArrows, 100);
+}
+
+initCarousel();
+initEditors();
+initP3Arrows();
+
+
+document.fonts.ready.then(() => {
+  svgEl.style.transition = 'opacity .4s ease';
+  svgEl.style.opacity    = '1';
+  initTimelineDots();
+});
+</script>
+</body>
+</html>
