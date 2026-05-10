@@ -814,9 +814,503 @@ body.light .p5-link--gh:hover .p5-link-value{ color:#000; }
 body.light .p5-location{ color:rgba(0,0,0,.25); }
 body.light .p5-location strong{ color:rgba(0,0,0,.6); }
 body.light .p5-sig{ color:rgba(0,0,0,.05); }
+
+.m-shell { display: none; }
+
+@media (max-width: 768px) {
+  html, body {
+    overflow: auto !important;
+    height: auto !important;
+    background: #080808;
+  }
+  #grain, #dots, .nav-logo, .nav-right,
+  #p1, #p2, #p3, #p4, #p5 { display: none !important; }
+
+  .m-shell {
+    display: block;
+    color: #e8e4dc;
+    font-family: 'DM Mono', monospace;
+  }
+  body.light .m-shell { color: #000; }
+  body.light { background: #fff !important; }
+
+  .m-header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.1rem 1.4rem;
+    background: rgba(8,8,8,.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(232,228,220,.06);
+  }
+  body.light .m-header { background: rgba(255,255,255,.88); border-bottom-color: rgba(0,0,0,.06); }
+  .m-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300; font-size: 1rem;
+    letter-spacing: 0.06em;
+    color: rgba(232,228,220,.85);
+  }
+  body.light .m-brand { color: #000; }
+
+  .m-burger {
+    width: 32px; height: 32px;
+    background: transparent;
+    border: 1px solid rgba(232,228,220,.15);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+  body.light .m-burger { border-color: rgba(0,0,0,.15); }
+  .m-burger span, .m-burger span::before, .m-burger span::after {
+    display: block; width: 14px; height: 1.5px;
+    background: rgba(232,228,220,.85);
+    position: relative; transition: all 0.25s;
+  }
+  body.light .m-burger span, body.light .m-burger span::before, body.light .m-burger span::after { background: #000; }
+  .m-burger span::before { content: ''; position: absolute; top: -5px; left: 0; }
+  .m-burger span::after  { content: ''; position: absolute; top: 5px;  left: 0; }
+  .m-burger.open span { background: transparent; }
+  .m-burger.open span::before { top: 0; transform: rotate(45deg); }
+  .m-burger.open span::after  { top: 0; transform: rotate(-45deg); }
+
+  .m-menu {
+    position: fixed; inset: 0; z-index: 99;
+    background: rgba(8,8,8,.97);
+    backdrop-filter: blur(20px);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 1.6rem;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.35s;
+  }
+  body.light .m-menu { background: rgba(255,255,255,.97); }
+  .m-menu.open { opacity: 1; pointer-events: auto; }
+  .m-menu-link {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300; font-size: 1.9rem;
+    color: rgba(232,228,220,.85);
+    text-decoration: none;
+  }
+  body.light .m-menu-link { color: #000; }
+  .m-menu-controls { margin-top: 1.5rem; display: flex; gap: 0.6rem; align-items: center; }
+  .m-lang { display: flex; border: 1px solid rgba(232,228,220,.18); border-radius: 2px; overflow: hidden; }
+  body.light .m-lang { border-color: rgba(0,0,0,.2); }
+  .m-lang-btn {
+    font-family: 'DM Mono', monospace; font-size: 0.6rem;
+    padding: 0.4rem 0.7rem; border: none; background: transparent;
+    color: rgba(232,228,220,.4); cursor: pointer;
+    text-transform: uppercase; letter-spacing: 0.1em;
+  }
+  .m-lang-btn.on { background: rgba(232,228,220,.85); color: #080808; }
+  body.light .m-lang-btn { color: rgba(0,0,0,.5); }
+  body.light .m-lang-btn.on { background: #000; color: #fff; }
+  .m-theme-btn {
+    font-family: 'DM Mono', monospace; font-size: 0.6rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid rgba(232,228,220,.18);
+    background: transparent;
+    color: rgba(232,228,220,.4);
+    cursor: pointer; border-radius: 2px;
+  }
+  body.light .m-theme-btn { border-color: rgba(0,0,0,.2); color: rgba(0,0,0,.5); }
+
+  /* SHELL com scroll-snap: cada seção ocupa tela cheia, scroll trava em cada P */
+  .m-shell {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    overflow-y: scroll;
+    height: 100vh;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Cada seção ocupa TELA CHEIA e tem snap */
+  .m-section {
+    padding: 6rem 1.6rem 4rem;
+    min-height: 100vh;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow-y: auto;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+  /* P3 (carreira) e P4 (projetos) podem ter conteúdo longo, deixa rolar internamente */
+  #m-p3, #m-p4 {
+    justify-content: flex-start;
+    padding-top: 5.5rem;
+  }
+  
+  /* TODAS as seções SEMPRE 100% visíveis. Scroll-snap garante uma por vez. */
+  .m-section {
+    opacity: 1;
+  }
+
+  /* Hero */
+  .m-hero {
+    align-items: center; text-align: center;
+    padding-top: 5rem;
+  }
+  .m-hero-logo {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 800; font-size: 9rem;
+    line-height: 0.85; letter-spacing: -0.08em;
+    color: rgba(232,228,220,.92);
+    margin-bottom: 1.5rem;
+  }
+  body.light .m-hero-logo { color: #000; }
+  .m-hero-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300; font-size: 1.7rem;
+    color: rgba(232,228,220,.9);
+    letter-spacing: 0.05em; margin-top: 1rem;
+  }
+  body.light .m-hero-name { color: #000; }
+  .m-hero-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem; letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(232,228,220,.4);
+    margin-top: 1rem;
+  }
+  body.light .m-hero-sub { color: rgba(0,0,0,.5); }
+  .m-hero-scroll {
+    margin-top: 4rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem; letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(232,228,220,.3);
+    text-decoration: none;
+    animation: m-bounce 2s ease-in-out infinite;
+  }
+  body.light .m-hero-scroll { color: rgba(0,0,0,.4); }
+  @keyframes m-bounce {
+    0%, 100% { transform: translateY(0); opacity: 0.4; }
+    50% { transform: translateY(6px); opacity: 0.85; }
+  }
+
+  .m-num {
+    font-size: 0.55rem; letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(232,228,220,.3);
+    margin-bottom: 1.5rem;
+  }
+  body.light .m-num { color: rgba(0,0,0,.35); }
+
+  .m-title {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 200; font-size: 2rem;
+    line-height: 1.1; letter-spacing: -0.03em;
+    margin-bottom: 1.8rem;
+    color: rgba(232,228,220,.95);
+  }
+  body.light .m-title { color: #000; }
+  .m-title em {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-weight: 300;
+    color: rgba(232,228,220,.4);
+    font-size: 1.1em;
+  }
+  body.light .m-title em { color: rgba(0,0,0,.4); }
+
+  .m-text p {
+    font-size: 0.85rem; line-height: 1.85;
+    color: rgba(232,228,220,.55);
+    margin-bottom: 1rem;
+  }
+  body.light .m-text p { color: rgba(0,0,0,.6); }
+  .m-text p strong { color: rgba(232,228,220,.95); font-weight: 400; }
+  body.light .m-text p strong { color: #000; }
+
+  .m-skills { margin-top: 2rem; display: flex; flex-direction: column; gap: 0.8rem; }
+  .m-skill { display: flex; align-items: center; gap: 0.8rem; }
+  .m-skill-name {
+    font-size: 0.62rem; letter-spacing: 0.06em;
+    color: rgba(232,228,220,.5);
+    width: 90px; flex-shrink: 0;
+  }
+  body.light .m-skill-name { color: rgba(0,0,0,.55); }
+  .m-skill-track {
+    flex: 1; height: 2px;
+    background: rgba(232,228,220,.1);
+    border-radius: 2px; overflow: hidden;
+  }
+  body.light .m-skill-track { background: rgba(0,0,0,.1); }
+  .m-skill-fill {
+    height: 100%;
+    background: rgba(232,228,220,.6);
+    width: 0%;
+    transition: width 1.4s cubic-bezier(.16,1,.3,1);
+  }
+  body.light .m-skill-fill { background: #000; }
+  .m-skill-pct {
+    font-size: 0.55rem;
+    color: rgba(232,228,220,.3);
+    width: 30px; text-align: right;
+  }
+  body.light .m-skill-pct { color: rgba(0,0,0,.4); }
+
+  .m-cv-area { margin-bottom: 2.5rem; }
+  .m-cv-btn {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem; letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(232,228,220,.65);
+    text-decoration: none;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid rgba(232,228,220,.2);
+    border-radius: 2px;
+  }
+  body.light .m-cv-btn { color: rgba(0,0,0,.65); border-color: rgba(0,0,0,.2); }
+
+  .m-job {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(232,228,220,.06);
+  }
+  body.light .m-job { border-bottom-color: rgba(0,0,0,.06); }
+  .m-job:last-child { border-bottom: none; }
+  .m-job-company {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600; font-size: 1.1rem;
+    color: rgba(232,228,220,.85);
+    margin-bottom: 0.4rem;
+  }
+  body.light .m-job-company { color: #000; }
+  .m-job-period {
+    font-size: 0.5rem; letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(232,228,220,.3);
+    margin-bottom: 0.5rem;
+  }
+  body.light .m-job-period { color: rgba(0,0,0,.4); }
+  .m-job-role {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 200; font-size: 0.85rem;
+    color: rgba(232,228,220,.95);
+    margin-bottom: 0.8rem;
+  }
+  body.light .m-job-role { color: #000; }
+  .m-job-desc {
+    font-size: 0.78rem; line-height: 1.8;
+    color: rgba(232,228,220,.5);
+    margin-bottom: 0.8rem;
+  }
+  body.light .m-job-desc { color: rgba(0,0,0,.55); }
+  .m-job-desc strong { color: rgba(232,228,220,.85); font-weight: 400; }
+  body.light .m-job-desc strong { color: #000; }
+  .m-job-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .m-job-tags span {
+    font-size: 0.46rem; letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.55rem;
+    border: 1px solid rgba(232,228,220,.12);
+    color: rgba(232,228,220,.4);
+  }
+  body.light .m-job-tags span { border-color: rgba(0,0,0,.12); color: rgba(0,0,0,.45); }
+
+  .m-project {
+    padding: 1.8rem 0;
+    border-bottom: 1px solid rgba(232,228,220,.06);
+  }
+  body.light .m-project { border-bottom-color: rgba(0,0,0,.06); }
+  .m-project:last-child { border-bottom: none; }
+  .m-project-title {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 200; font-size: 1.3rem;
+    line-height: 1.2;
+    color: rgba(232,228,220,.95);
+    margin-bottom: 0.8rem;
+  }
+  body.light .m-project-title { color: #000; }
+  .m-project-desc {
+    font-size: 0.8rem; line-height: 1.85;
+    color: rgba(232,228,220,.5);
+    margin-bottom: 1rem;
+  }
+  body.light .m-project-desc { color: rgba(0,0,0,.55); }
+  .m-project-desc strong { color: rgba(232,228,220,.85); font-weight: 400; }
+  body.light .m-project-desc strong { color: #000; }
+  .m-project-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 1.2rem; }
+  .m-project-tags span {
+    font-size: 0.46rem; letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.55rem;
+    border: 1px solid rgba(232,228,220,.12);
+    color: rgba(232,228,220,.4);
+  }
+  body.light .m-project-tags span { border-color: rgba(0,0,0,.12); color: rgba(0,0,0,.45); }
+  .m-project-buttons { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .m-project-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem; letter-spacing: 0.16em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.7rem 1.1rem;
+    border: 1px solid rgba(232,228,220,.18);
+    color: rgba(232,228,220,.6);
+    border-radius: 2px;
+  }
+  body.light .m-project-btn { border-color: rgba(0,0,0,.2); color: rgba(0,0,0,.65); }
+  .m-project-btn.primary {
+    background: rgba(232,228,220,.85);
+    color: #080808;
+    border-color: rgba(232,228,220,.85);
+  }
+  body.light .m-project-btn.primary { background: #000; color: #fff; border-color: #000; }
+  .m-project-soon {
+    text-align: center;
+    border: 1px dashed rgba(232,228,220,.1);
+    border-radius: 4px;
+    padding: 2rem 1rem;
+    margin-top: 1rem;
+  }
+  body.light .m-project-soon { border-color: rgba(0,0,0,.1); }
+
+  .m-contact-sub {
+    font-size: 0.78rem; line-height: 1.85;
+    color: rgba(232,228,220,.4);
+    margin-bottom: 2.5rem;
+  }
+  body.light .m-contact-sub { color: rgba(0,0,0,.5); }
+  .m-contacts { display: flex; flex-direction: column; gap: 0.6rem; }
+  .m-contact {
+    display: block;
+    padding: 1rem 1.2rem;
+    border: 1px solid rgba(232,228,220,.08);
+    border-radius: 3px;
+    text-decoration: none;
+  }
+  body.light .m-contact { border-color: rgba(0,0,0,.08); }
+  .m-contact-label {
+    font-size: 0.45rem; letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(232,228,220,.3);
+    margin-bottom: 0.3rem;
+  }
+  body.light .m-contact-label { color: rgba(0,0,0,.4); }
+  .m-contact-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300; font-size: 1rem;
+    color: rgba(232,228,220,.7);
+  }
+  body.light .m-contact-value { color: #000; }
+  .m-footer {
+    margin-top: 3rem;
+    text-align: center;
+    font-size: 0.55rem; letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(232,228,220,.25);
+  }
+  body.light .m-footer { color: rgba(0,0,0,.35); }
+}
+
 </style>
 </head>
 <body>
+
+<!-- ═══════ MOBILE ═══════ -->
+<div class="m-shell">
+  <header class="m-header">
+    <div class="m-brand">Marcos Pereira</div>
+    <button class="m-burger" id="m-burger" aria-label="Menu"><span></span></button>
+  </header>
+
+  <div class="m-menu" id="m-menu">
+    <a class="m-menu-link" href="#m-p1" data-pt="Início" data-en="Home">Início</a>
+    <a class="m-menu-link" href="#m-p2" data-pt="Sobre" data-en="About">Sobre</a>
+    <a class="m-menu-link" href="#m-p3" data-pt="Carreira" data-en="Career">Carreira</a>
+    <a class="m-menu-link" href="#m-p4" data-pt="Projetos" data-en="Projects">Projetos</a>
+    <a class="m-menu-link" href="#m-p5" data-pt="Contato" data-en="Contact">Contato</a>
+    <div class="m-menu-controls">
+      <div class="m-lang">
+        <button class="m-lang-btn on" data-lang="pt">PT</button>
+        <button class="m-lang-btn" data-lang="en">EN</button>
+      </div>
+      <button class="m-theme-btn" id="m-theme-btn">◑</button>
+    </div>
+  </div>
+
+  <section class="m-section m-hero" id="m-p1">
+    <div class="m-hero-logo">MP</div>
+    <div class="m-hero-name">Marcos Pereira</div>
+    <div class="m-hero-sub"><span data-pt="Análises · BI · Automações" data-en="Data Analysis · BI · Automations">Análises · BI · Automações</span></div>
+    <a href="#m-p2" class="m-hero-scroll" data-pt="↓ Explorar" data-en="↓ Explore">↓ Explorar</a>
+  </section>
+
+  <section class="m-section" id="m-p2">
+    <div class="m-num">01 — <span data-pt="Sobre" data-en="About">Sobre</span></div>
+    <h2 class="m-title" data-pt="Análise que vai da operação à <em>diretoria</em>" data-en="Analysis from operations to the <em>boardroom</em>">Análise que vai da operação à <em>diretoria</em></h2>
+    <div class="m-text">
+      <p data-pt="Experiência em análise de dados e automação de processos, com passagens pela <strong>McKinsey & Company</strong> e <strong>Copa Energia</strong>. Dashboards Power BI a partir de relatórios SAP e soluções em VBA que eliminam trabalho manual." data-en="Experience in data analysis and process automation at <strong>McKinsey & Company</strong> and <strong>Copa Energia</strong>. Power BI dashboards from SAP reports and VBA solutions that eliminate manual work.">Experiência em análise de dados e automação de processos, com passagens pela <strong>McKinsey & Company</strong> e <strong>Copa Energia</strong>. Dashboards Power BI a partir de relatórios SAP e soluções em VBA que eliminam trabalho manual.</p>
+      <p data-pt="Bilíngue em <strong>Português e Inglês</strong> — pós-graduação em International Business Management pelo Greystone College, Toronto." data-en="Bilingual in <strong>Portuguese and English</strong> — postgraduate in International Business Management from Greystone College, Toronto.">Bilíngue em <strong>Português e Inglês</strong> — pós-graduação em International Business Management pelo Greystone College, Toronto.</p>
+    </div>
+    <div class="m-skills">
+      <div class="m-skill"><span class="m-skill-name">Power BI</span><div class="m-skill-track"><div class="m-skill-fill" data-w="90"></div></div><span class="m-skill-pct">90%</span></div>
+      <div class="m-skill"><span class="m-skill-name">Excel + VBA</span><div class="m-skill-track"><div class="m-skill-fill" data-w="95"></div></div><span class="m-skill-pct">95%</span></div>
+      <div class="m-skill"><span class="m-skill-name">SAP ECC</span><div class="m-skill-track"><div class="m-skill-fill" data-w="85"></div></div><span class="m-skill-pct">85%</span></div>
+      <div class="m-skill"><span class="m-skill-name">SQL</span><div class="m-skill-track"><div class="m-skill-fill" data-w="60"></div></div><span class="m-skill-pct">60%</span></div>
+      <div class="m-skill"><span class="m-skill-name">Python</span><div class="m-skill-track"><div class="m-skill-fill" data-w="30"></div></div><span class="m-skill-pct">30%</span></div>
+    </div>
+  </section>
+
+  <section class="m-section" id="m-p3">
+    <div class="m-num">02 — <span data-pt="Carreira" data-en="Career">Carreira</span></div>
+    <div class="m-cv-area"><a class="m-cv-btn" href="Completo_-_PT-BR__1_.pdf" download>↓ CV PT-BR</a></div>
+    <div class="m-job"><div class="m-job-company">COPA Energia</div><div class="m-job-period" data-pt="Out 2025 — Presente · São Paulo" data-en="Oct 2025 — Present · São Paulo">Out 2025 — Presente · São Paulo</div><div class="m-job-role" data-pt="Analista de Custos Jr" data-en="Junior Cost Analyst">Analista de Custos Jr</div><div class="m-job-desc" data-pt="Análise e rateio de custos, importação no <strong>SAP ECC</strong>. Dashboards <strong>Power BI</strong> a partir de relatórios SAP." data-en="Cost analysis and allocation, importation in <strong>SAP ECC</strong>. <strong>Power BI</strong> dashboards from SAP reports.">Análise e rateio de custos, importação no <strong>SAP ECC</strong>. Dashboards <strong>Power BI</strong> a partir de relatórios SAP.</div><div class="m-job-tags"><span>Power BI</span><span>SAP ECC</span><span>VBA</span></div></div>
+    <div class="m-job"><div class="m-job-company">McKinsey &amp; Company</div><div class="m-job-period" data-pt="Ago 2021 — Out 2025 · São Paulo" data-en="Aug 2021 — Oct 2025 · São Paulo">Ago 2021 — Out 2025 · São Paulo</div><div class="m-job-role">Executive Assistant</div><div class="m-job-desc" data-pt="Itinerários e viagens para consultores globais. Melhorias em <strong>pagamentos e reembolsos</strong> via <strong>SAP Concur</strong>." data-en="Itineraries and travel for global consultants. <strong>Payment</strong> process improvements via <strong>SAP Concur</strong>.">Itinerários e viagens para consultores globais. Melhorias em <strong>pagamentos e reembolsos</strong> via <strong>SAP Concur</strong>.</div><div class="m-job-tags"><span>SAP Concur</span><span>VBA</span><span>Power BI</span></div></div>
+    <div class="m-job"><div class="m-job-company">SEREDE</div><div class="m-job-period" data-pt="Nov 2020 — Abr 2021 · Salvador" data-en="Nov 2020 — Apr 2021 · Salvador">Nov 2020 — Abr 2021 · Salvador</div><div class="m-job-role" data-pt="Analista de Qualidade" data-en="Quality Analyst">Analista de Qualidade</div><div class="m-job-desc" data-pt="Análise crítica de processos em serviços técnicos." data-en="Critical analysis of technical services processes.">Análise crítica de processos em serviços técnicos.</div><div class="m-job-tags"><span>Processos</span><span>Qualidade</span></div></div>
+    <div class="m-job"><div class="m-job-company">Aromarketing</div><div class="m-job-period" data-pt="Set 2019 — Nov 2020 · Salvador" data-en="Sep 2019 — Nov 2020 · Salvador">Set 2019 — Nov 2020 · Salvador</div><div class="m-job-role" data-pt="Assistente Adm. Financeiro" data-en="Financial Admin. Assistant">Assistente Adm. Financeiro</div><div class="m-job-desc" data-pt="Conciliação bancária, cobranças, antecipação de recebíveis e <strong>avaliação de crédito</strong>." data-en="Bank reconciliation, collections, receivables anticipation and <strong>credit evaluation</strong>.">Conciliação bancária, cobranças, antecipação de recebíveis e <strong>avaliação de crédito</strong>.</div><div class="m-job-tags"><span>Financeiro</span><span>Crédito</span></div></div>
+    <div class="m-job"><div class="m-job-company">Bargains Group</div><div class="m-job-period" data-pt="Out 2018 — Abr 2019 · Toronto" data-en="Oct 2018 — Apr 2019 · Toronto">Out 2018 — Abr 2019 · Toronto</div><div class="m-job-role" data-pt="Assistente de Marketing" data-en="Marketing Assistant">Assistente de Marketing</div><div class="m-job-desc" data-pt="Banners para <strong>e-mail marketing</strong>. Modificação de produtos no catálogo." data-en="Banners for <strong>email marketing</strong>. Product adjustments in the catalog.">Banners para <strong>e-mail marketing</strong>. Modificação de produtos no catálogo.</div><div class="m-job-tags"><span>Marketing</span><span>E-commerce</span></div></div>
+    <div class="m-job"><div class="m-job-company">GAP Inc.</div><div class="m-job-period" data-pt="Nov 2018 — Mai 2019 · Toronto" data-en="Nov 2018 — May 2019 · Toronto">Nov 2018 — Mai 2019 · Toronto</div><div class="m-job-role">Sales Associate</div><div class="m-job-desc" data-pt="Vendas na franquia <strong>Bay/Bloor</strong> em Toronto." data-en="Sales at <strong>Bay/Bloor</strong> store in Toronto.">Vendas na franquia <strong>Bay/Bloor</strong> em Toronto.</div><div class="m-job-tags"><span>Varejo</span><span>Vendas</span></div></div>
+  </section>
+
+  <section class="m-section" id="m-p4">
+    <div class="m-num">03 — <span data-pt="Projetos" data-en="Projects">Projetos</span></div>
+    <div class="m-project">
+      <h3 class="m-project-title" data-pt="Veículos Roubados em São Paulo" data-en="Stolen Vehicles in São Paulo">Veículos Roubados em São Paulo</h3>
+      <p class="m-project-desc" data-pt="Dashboard analisando registros oficiais da <strong>SSP-SP</strong> entre 2017 e 2026. Pipeline em <strong>Python</strong> via <strong>GitHub Actions</strong>." data-en="Dashboard analyzing <strong>SSP-SP</strong> records from 2017 to 2026. <strong>Python</strong> pipeline via <strong>GitHub Actions</strong>.">Dashboard analisando registros oficiais da <strong>SSP-SP</strong> entre 2017 e 2026. Pipeline em <strong>Python</strong> via <strong>GitHub Actions</strong>.</p>
+      <div class="m-project-tags"><span>Power BI</span><span>Python</span><span>GitHub Actions</span></div>
+      <div class="m-project-buttons">
+        <a class="m-project-btn primary" href="https://app.powerbi.com/view?r=eyJrIjoiM2NkMmVkMmQtYmMyMS00M2UzLWIzMzUtNDNmY2E0NTFlZTQzIiwidCI6IjIzNWU2NTZlLTJhYTktNDMyNy05M2IxLWQwOTI2YTY5YjBmNyJ9" target="_blank" data-pt="↗ Abrir Dashboard" data-en="↗ Open Dashboard">↗ Abrir Dashboard</a>
+        <a class="m-project-btn" href="https://github.com/mpsp2192/FIPEdash" target="_blank">GitHub</a>
+      </div>
+    </div>
+    <div class="m-project">
+      <h3 class="m-project-title" data-pt="Macros &amp; Automações em VBA" data-en="Macros &amp; Automations in VBA">Macros &amp; Automações em VBA</h3>
+      <p class="m-project-desc" data-pt="Macros em <strong>VBA/Excel</strong> para automação de processos repetitivos." data-en="<strong>VBA/Excel</strong> macros for repetitive process automation.">Macros em <strong>VBA/Excel</strong> para automação de processos repetitivos.</p>
+      <div class="m-project-tags"><span>Excel</span><span>VBA</span></div>
+      <div class="m-project-buttons"><a class="m-project-btn primary" href="https://github.com/mpsp2192/VBA-Coding" target="_blank">↗ GitHub</a></div>
+    </div>
+    <div class="m-project">
+      <h3 class="m-project-title" data-pt="Scripts em Python" data-en="Scripts in Python">Scripts em Python</h3>
+      <p class="m-project-desc" data-pt="Scripts em <strong>Python</strong> para coleta, tratamento e automação de dados." data-en="<strong>Python</strong> scripts for data collection, processing and automation.">Scripts em <strong>Python</strong> para coleta, tratamento e automação de dados.</p>
+      <div class="m-project-tags"><span>Python</span><span>Pandas</span><span>ETL</span></div>
+      <div class="m-project-buttons"><a class="m-project-btn primary" href="https://github.com/mpsp2192/Python" target="_blank">↗ GitHub</a></div>
+    </div>
+    <div class="m-project m-project-soon">
+      <h3 class="m-project-title" data-pt="Próximo projeto" data-en="Next project">Próximo projeto</h3>
+      <p class="m-project-desc" data-pt="Novos projetos chegando em breve." data-en="New projects coming soon.">Novos projetos chegando em breve.</p>
+    </div>
+  </section>
+
+  <section class="m-section" id="m-p5">
+    <div class="m-num">04 — <span data-pt="Contato" data-en="Contact">Contato</span></div>
+    <h2 class="m-title" data-pt="Vamos <em>conversar</em>" data-en="Let's <em>talk</em>">Vamos <em>conversar</em></h2>
+    <p class="m-contact-sub" data-pt="Projetos, parcerias ou só uma boa conversa." data-en="Projects, partnerships or just a good conversation.">Projetos, parcerias ou só uma boa conversa.</p>
+    <div class="m-contacts">
+      <a class="m-contact" href="https://www.linkedin.com/in/marcos-paulo-pereira-ba0800156" target="_blank"><div class="m-contact-label">LinkedIn</div><div class="m-contact-value">Marcos Paulo Pereira</div></a>
+      <a class="m-contact" href="https://wa.me/5571996289679" target="_blank"><div class="m-contact-label">WhatsApp</div><div class="m-contact-value">+55 (71) 99628-9679</div></a>
+      <a class="m-contact" href="mailto:marcospsp92@gmail.com"><div class="m-contact-label">E-mail</div><div class="m-contact-value">marcospsp92@gmail.com</div></a>
+      <a class="m-contact" href="https://github.com/mpsp2192" target="_blank"><div class="m-contact-label">GitHub</div><div class="m-contact-value">github.com/mpsp2192</div></a>
+    </div>
+    <div class="m-footer"><span data-pt="São Paulo, Brasil" data-en="São Paulo, Brazil">São Paulo, Brasil</span></div>
+  </section>
+</div>
+
 <div id="grain"></div>
 
 <div id="dots">
@@ -1560,6 +2054,7 @@ function goTo(idx) {
 
 // ── SCROLL / WHEEL ────────────────────────────────────────────
 window.addEventListener('wheel', e => {
+  if (window.matchMedia('(max-width: 768px)').matches) return;
   e.preventDefault();
   if (page === 2) {
     const track = document.getElementById('p3-track');
@@ -1940,6 +2435,94 @@ initCarousel();
 initEditors();
 initP3Arrows();
 
+
+
+// ═══ MOBILE ═══
+(function(){
+  if (!window.matchMedia('(max-width: 768px)').matches) return;
+  
+  // Bloqueia wheel listener original do desktop no mobile
+  // (já foi feito ao alterar o listener acima)
+  
+  function init() {
+    // Menu
+    const burger = document.getElementById('m-burger');
+    const menu   = document.getElementById('m-menu');
+    if (burger && menu) {
+      burger.onclick = () => {
+        burger.classList.toggle('open');
+        menu.classList.toggle('open');
+      };
+      menu.querySelectorAll('.m-menu-link').forEach(link => {
+        link.onclick = (e) => {
+          e.preventDefault();
+          burger.classList.remove('open');
+          menu.classList.remove('open');
+          const href = link.getAttribute('href');
+          if (href && href.startsWith('#')) {
+            const target = document.querySelector(href);
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
+        };
+      });
+      
+      // Mesma coisa para a setinha "↓ Explorar" do hero
+      const heroScroll = document.querySelector('.m-hero-scroll');
+      if (heroScroll) {
+        heroScroll.onclick = (e) => {
+          e.preventDefault();
+          const target = document.getElementById('m-p2');
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+      }
+    }
+    
+    // Lang
+    document.querySelectorAll('.m-lang-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.m-lang-btn').forEach(b => b.classList.toggle('on', b === btn));
+        if (typeof setLang === 'function') setLang(btn.dataset.lang);
+      };
+    });
+    
+    // Tema
+    const themeBtn = document.getElementById('m-theme-btn');
+    if (themeBtn && typeof toggleTheme === 'function') {
+      themeBtn.onclick = () => toggleTheme();
+    }
+    
+    // Skill bars: animar quando P2 ficar visível dentro do shell
+    const shell = document.querySelector('.m-shell');
+    const p2 = document.getElementById('m-p2');
+    let skillBarsAnimated = false;
+    
+    function checkSkillBars() {
+      if (skillBarsAnimated || !p2 || !shell) return;
+      const rect = p2.getBoundingClientRect();
+      const shellRect = shell.getBoundingClientRect();
+      // Se P2 está na tela
+      if (rect.top < shellRect.bottom && rect.bottom > shellRect.top) {
+        skillBarsAnimated = true;
+        p2.querySelectorAll('.m-skill-fill').forEach((f, i) => {
+          setTimeout(() => { f.style.width = f.dataset.w + '%'; }, i * 100 + 200);
+        });
+      }
+    }
+    
+    if (shell) {
+      shell.addEventListener('scroll', checkSkillBars, { passive: true });
+      checkSkillBars();
+    }
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
 
 document.fonts.ready.then(() => {
   svgEl.style.transition = 'opacity .4s ease';
